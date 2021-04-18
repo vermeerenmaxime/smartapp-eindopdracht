@@ -18,27 +18,24 @@ import AppButton from "../../components/appButton";
 import { app } from "../../styles/app";
 import { header } from "../../styles/components/header";
 
-const Stack = createStackNavigator();
-
-import firebase from "../../database/firebase";
+import {firebase} from "../../database/firebase";
+import { color } from "../../styles/colors";
 
 const Login = ({ route, navigation }: any) => {
   const [email, setEmail] = useState("maxime6128@gmail.com");
-  const [password, setPassword] = useState("E");
+  const [password, setPassword] = useState("Eeeeee");
 
   const [loading, setLoading] = useState(false);
 
-  const { userLoggedIn } = route.params;
-
-  const checkUserPermission = (email: string, password: string) => {
-    if (email == "maxime6128@gmail.com" && password == "E") {
-      navigation.navigate("TabNavigation", {
-        email: "maxime6128@gmail.com",
-      });
-    } else {
-      Alert.alert("Password is onjuist");
-    }
-  };
+  // const checkUserPermission = (email: string, password: string) => {
+  //   if (email == "maxime6128@gmail.com" && password == "E") {
+  //     navigation.navigate("TabNavigation", {
+  //       email: "maxime6128@gmail.com",
+  //     });
+  //   } else {
+  //     Alert.alert("Password is onjuist");
+  //   }
+  // };
 
   const userLogin = () => {
     if (email === "" && password === "") {
@@ -55,16 +52,19 @@ const Login = ({ route, navigation }: any) => {
           setEmail("");
           setPassword("");
           navigation.navigate("TabNavigation", {
-            email: "test",
+            // user: res.user,
           });
         })
-        .catch((error) => alert("No"));
+        .catch((error) => {
+          alert(error);
+          setLoading(false);
+        });
     }
   };
   if (loading) {
     return (
       <View>
-        <ActivityIndicator size="large" color="#9E9E9E" />
+        <ActivityIndicator size="large" color={color.gray} />
       </View>
     );
   } else {

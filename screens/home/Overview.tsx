@@ -13,7 +13,7 @@ import StorySmall from "../../components/storySmall";
 const Stack = createStackNavigator();
 
 const Overview = ({ route, navigation }: any) => {
-  const email = route.params.email;
+
   return (
     <SafeAreaView style={app.container}>
       <Header title="Home" props={route.params} />

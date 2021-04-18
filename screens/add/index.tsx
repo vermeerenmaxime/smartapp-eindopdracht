@@ -2,22 +2,22 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import AddArticle from "./AddArticle";
-import NewStory from "./NewStory";
+import AddStory from "./AddStory";
 
 const Stack = createStackNavigator();
 
 const Add = ({ route, navigation }: any) => {
   return (
     // headerMode="none"
-    <Stack.Navigator headerMode="none" initialRouteName="NewStory">
+    <Stack.Navigator headerMode="none" initialRouteName="AddStory">
       <Stack.Screen
         name="AddArticle"
         component={AddArticle}
         initialParams={route.params}
       ></Stack.Screen>
       <Stack.Screen
-        name="NewStory"
-        component={NewStory}
+        name="AddStory"
+        component={AddStory}
         initialParams={route.params}
       ></Stack.Screen>
     </Stack.Navigator>

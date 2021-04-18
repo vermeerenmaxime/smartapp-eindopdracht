@@ -2,6 +2,21 @@ import { StyleSheet } from "react-native";
 import { color } from "../colors";
 
 export const story = StyleSheet.create({
+  big: {
+    backgroundColor: "rgba(0,0,0,0.3)",
+    height: 80,
+    width: "100%",
+    borderRadius: 12,
+
+    marginBottom: 8,
+
+    shadowColor: "black",
+    shadowOpacity: 0.15,
+    elevation: 25,
+    shadowRadius: 25,
+
+    overflow: "hidden",
+  },
   small: {
     marginRight: 8,
     backgroundColor: "rgba(0,0,0,0.3)",
@@ -19,17 +34,11 @@ export const story = StyleSheet.create({
     color: "white",
     fontFamily: "RobotoMedium",
   },
-  big: {
-    marginRight: 8,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    height: 100,
-    width: 140,
-    borderRadius: 12,
-
-    shadowColor: "black",
-    shadowOpacity: 0.15,
-    elevation: 25,
-    shadowRadius: 25,
+  bigText: {
+    fontSize: 18,
+    padding: 16,
+    color: "white",
+    fontFamily: "RobotoMedium",
   },
   image: {
     width: "100%",
@@ -93,6 +102,13 @@ export const story = StyleSheet.create({
   },
   likeIcon: {
     color: "white",
+  },
+  editIcon: {
+    color: "black",
+    padding: 8,
+    backgroundColor: color.light,
+    borderRadius: 100,
+    marginLeft: "auto",
   },
   linearGradient: {
     overflow: "visible",

@@ -4,7 +4,7 @@ import { color } from "./colors";
 
 export const app = StyleSheet.create({
   container: {
-    paddingVertical: 32,
+    // paddingVertical: 16,
     paddingHorizontal: 32,
   },
   containerWelcome: {
@@ -38,7 +38,7 @@ export const app = StyleSheet.create({
   },
   button: {
     backgroundColor: color.alpha,
-    borderRadius: 50,
+    borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 12,
     // width: 150,

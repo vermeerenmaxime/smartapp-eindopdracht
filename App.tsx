@@ -21,7 +21,6 @@ export default function App() {
     RobotoMedium: require("./assets/fonts/roboto/Roboto-Medium.ttf"),
   });
 
-  
   const [userLoggedIn] = useState(false);
   if (loaded) {
     if (userLoggedIn) {
@@ -39,7 +38,7 @@ export default function App() {
               initialParams={{ userLoggedIn: false }}
             />
             <Stack.Screen name="Register" component={Register} />
-            <Stack.Screen name="TabNavigation" component={TabNavigation}/>
+            <Stack.Screen name="TabNavigation" component={TabNavigation} />
           </Stack.Navigator>
           {/* <TabNavigation></TabNavigation> */}
         </NavigationContainer>

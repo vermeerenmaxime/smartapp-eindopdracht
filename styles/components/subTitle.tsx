@@ -13,6 +13,7 @@ export const subtitle = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: color.black,
+    // justifySelf: "flex-start",
   },
   stroke: {
     width: 4,

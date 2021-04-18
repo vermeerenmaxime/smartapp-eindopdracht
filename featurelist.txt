@@ -4,3 +4,40 @@
 - Add Photo/moment
 - Exlore (map)
 - Me
+
+
+// Images uploaden
+// https://www.youtube.com/watch?v=KkZckepfm2Q
+
+// images downloaden
+var ref = firebase.storage().ref('images/profilepictures/536887a2-c8fe-4c60-b2f1-3864f691fa9e.jpg');
+this.imageUploaded = await ref.getDownloadURL();
+
+https://www.pluralsight.com/guides/integrate-firebase-storage-and-image-picker-in-react-native
+
+
+Firebase auth
+https://github.com/didinj/react-native-firebase-authentication-email-password/tree/master/components
+
+!! Todo !!
+- Public stories op map plaatsen
+- Public story to story
+
+- Story editten
+- Story liken
+
+- Article toevoegen
+- Article editten
+
+- App/User settings
+- - Upload profile pricture
+- - Update display name
+
+
+- FY, curated & top likes van deze dag
+
+- Header profile picture
+
+!! Error !!
+- Swipe back to old page => Foute pagina
+- Image kan niet gevonden worden op de server => bestaat wel

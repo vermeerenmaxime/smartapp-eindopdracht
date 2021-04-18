@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
@@ -14,6 +14,7 @@ const Tab = createBottomTabNavigator();
 import Home from "../screens/home";
 import User from "../screens/user";
 import Add from "../screens/add";
+import Map from "../screens/map";
 
 import { color } from "../styles/colors";
 
@@ -21,13 +22,14 @@ import { navigationBottom } from "../styles/components/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 
 import { faHome } from "@fortawesome/free-solid-svg-icons";
+import { firebase, firestore } from "../database/firebase";
 
 function Fy({}) {
   return <Text>fy</Text>;
 }
-function Map({}) {
-  return <Text>fy</Text>;
-}
+// function Map({}) {
+//   return <Text>fy</Text>;
+// }
 
 function CustomTabBar({ navigation, state, position }: any) {
   return (
@@ -37,7 +39,7 @@ function CustomTabBar({ navigation, state, position }: any) {
         activeOpacity={0.6}
         style={navigationBottom.button}
       >
-        <Ionicons name="book" size="12" color="white" />
+        <Ionicons name="book" size={12} color="white" />
         <Text style={navigationBottom.TextStyle}>home </Text>
       </TouchableOpacity>
 
@@ -81,50 +83,86 @@ function CustomTabBar({ navigation, state, position }: any) {
   );
 }
 
+interface UserModule {
+  displayName: string;
+  email: string;
+  photoURL: string;
+}
 export default function MainNavigation({ route, navigation }: any) {
-  return (
-    <Tab.Navigator
-      // tabBar={(props) => <CustomTabBar {...props} />}
-      // screenOptions={customTabOptions}
-      tabBarOptions={{
-        inactiveTintColor: "white",
-        activeTintColor: "#59D999",
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState<UserModule>({
+    displayName: "",
+    email: "",
+    photoURL: "",
+  });
 
-        tabStyle: {},
-        safeAreaInsets: {
-          //bottom:0
-        },
-        style: {
-          borderTopWidth: 0,
-          backgroundColor: "#312F2F",
-        },
-        labelStyle: {
-          fontSize: 16,
-          fontWeight: "bold",
-        },
-      }}
-    >
-      <Tab.Screen
-        name="home"
-        component={Home}
-        initialParams={route.params}
-        options={{
-          title: "",
-          tabBarIcon: ({ size, focused }) => {
-            return (
-              <FontAwesomeIcon
-                icon={faHome}
-                style={{ color: color.alpha }}
-                size={24}
-              ></FontAwesomeIcon>
-            );
-          },
-        }}
-      />
-      <Tab.Screen name="fy" component={Fy} />
-      <Tab.Screen name="+" component={Add} initialParams={route.params} />
-      <Tab.Screen name="map" component={Map} />
-      <Tab.Screen name="user" component={User} initialParams={route.params} />
-    </Tab.Navigator>
-  );
+  const onAuthStateChanged = (user: any) => {
+    setUser(user);
+    route.params.user = user;
+    if (initializing) setInitializing(false);
+    console.log(route.params);
+  };
+
+  useEffect(() => {
+    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
+
+  if (initializing) return null;
+  else {
+    if (!user) {
+      return navigation.navigate("Login");
+    } else {
+      return (
+        <Tab.Navigator
+          // tabBar={(props) => <CustomTabBar {...props} />}
+          // screenOptions={customTabOptions}
+          tabBarOptions={{
+            inactiveTintColor: "white",
+            activeTintColor: "#59D999",
+
+            tabStyle: {},
+            safeAreaInsets: {
+              //bottom:0
+            },
+            style: {
+              borderTopWidth: 0,
+              backgroundColor: "#312F2F",
+            },
+            labelStyle: {
+              fontSize: 16,
+              fontWeight: "bold",
+            },
+          }}
+        >
+          <Tab.Screen
+            name="home"
+            component={Home}
+            initialParams={route.params}
+            // options={{
+            //   title: "",
+
+            //   tabBarIcon: ({ size, focused }) => {
+            //     return (
+            //       <FontAwesomeIcon
+            //         icon={faHome}
+            //         style={{ color: color.alpha }}
+            //         size={16}
+            //       ></FontAwesomeIcon>
+            //     );
+            //   },
+            // }}
+          />
+          <Tab.Screen name="fy" component={Fy} />
+          <Tab.Screen name="+" component={Add} initialParams={route.params} />
+          <Tab.Screen name="map" component={Map} />
+          <Tab.Screen
+            name="user"
+            component={User}
+            initialParams={route.params}
+          />
+        </Tab.Navigator>
+      );
+    }
+  }
 }

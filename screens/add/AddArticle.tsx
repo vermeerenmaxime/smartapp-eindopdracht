@@ -17,6 +17,10 @@ import {
 import { Select, Option } from "react-native-select-lists";
 // https://www.npmjs.com/package/react-native-lists-select
 
+// ! FIREBASE FILE UPLOAD
+// https://www.youtube.com/watch?v=GEtqS9Qozv4
+// https://www.pluralsight.com/guides/upload-images-to-firebase-storage-in-react-native
+
 import * as ImagePicker from "expo-image-picker";
 import Constants from "expo-constants";
 
@@ -36,14 +40,21 @@ import { story } from "../../styles/components/story";
 
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { firestore } from "../../database/firebase";
 
 const Stack = createStackNavigator();
 
 const AddArticle = ({ route, navigation }: any) => {
   const [visible, setVisible] = useState(false);
-  const [overlayImage, setOverlayImage] = useState();
+  const [overlayImage, setOverlayImage] = useState("");
+  const [userStories, setUserStories] = useState([""]);
+  // let userStories = [{ id: 1, title: "hi" }];
 
-  // const [image, setImage] = useState("");
+  const [articleStory, setArticleStory] = useState("");
+  const [articleTitle, setArticleTitle] = useState("");
+  const [articleNote, setArticleNote] = useState("");
+
+  // const [story, setStory] = useState<Story[]>([]);
 
   const toggleOverlay = () => {
     setVisible(!visible);
@@ -57,6 +68,7 @@ const AddArticle = ({ route, navigation }: any) => {
   ]);
 
   const clickImage = (image: any) => {
+    setOverlayImage(image);
     toggleOverlay();
   };
 
@@ -64,7 +76,6 @@ const AddArticle = ({ route, navigation }: any) => {
     delete storyImages[image];
   };
 
-  const email = route.params.email;
   useEffect(() => {
     (async () => {
       if (Platform.OS !== "web") {
@@ -76,6 +87,8 @@ const AddArticle = ({ route, navigation }: any) => {
         }
       }
     })();
+    setUserStories([]);
+    getUserStories();
   }, []);
 
   const pickImage = async () => {
@@ -87,34 +100,122 @@ const AddArticle = ({ route, navigation }: any) => {
     });
 
     if (!result.cancelled) {
-      // setImage(result.uri);
       setStoryImages([...storyImages, result.uri]);
       console.log(storyImages);
     }
   };
+
+  // Old method
+  // const getUserStories = () => {
+  //   var storiesRef = firestore.collection("story");
+
+  //   storiesRef
+  //     .where("author", "==", route.params.user.uid)
+  //     .get()
+  //     //@ts-ignore
+  //     .then((querySnapshot) => {
+  //       querySnapshot.forEach((doc) => {
+  //         console.log(doc.id, " => ", doc.data().title);
+
+  //         let obj = {
+  //           id: doc.id,
+  //           title: doc.data().title,
+  //         };
+
+  //         setUserStories((userStories) => [
+  //           ...userStories,
+  //           [doc.id, doc.data().title],
+  //         ]);
+
+  //         // console.log(userStories);
+  //       });
+  //     })
+  //     .catch((error: any) => {
+  //       console.log("Error getting documents: ", error);
+  //     });
+  // };
+
+  const getUserStories = () => {
+    var storiesRef = firestore.collection("story");
+
+    storiesRef
+      .where("author", "==", route.params.user.uid)
+      .get()
+      .then((query) => {
+        let stories: any[] = [];
+
+        query.forEach((doc) => {
+          let newStory = {
+            id: doc.id,
+            title: doc.data().title,
+            image: doc.data().image,
+          };
+
+          stories.push(newStory);
+
+          // ! Dit zorgt ervoor dat ik maar 1 item te zien krijg ipv mijn hele lijst, vandaar de stories.push
+          // setUserStories([...userStories, newStory]);
+        });
+        setUserStories(stories);
+      })
+      .catch((error: any) => {
+        console.log("Error getting documents: ", error);
+      });
+  };
+
+  const addArticle = () => {
+    console.log("woop");
+    let imageName = `article-${route.params.user.uid}-${new Date().getTime()}`;
+    // await uploadImage(storyImage, imageName)
+    //   .then(async () => {
+    //     await getImageFromUpload(imageName);
+    //   })
+    //   .catch((error) => {
+    //     Alert.alert(error);
+    //   });
+
+    firestore
+      .collection("article")
+      .add({
+        storyId: articleStory,
+        title: articleTitle,
+        note: articleNote,
+        images: ["hi", "oops"],
+      })
+      .then(() => {
+        console.log(articleStory, "Article succesfully added!");
+        // navigation.navigate("Story", { storyId: 1 });
+      })
+      .catch((error) => {
+        console.error("Error adding article: ", error);
+      });
+  };
   return (
-    <SafeAreaView style={app.container}>
-      <Header title="Add" props={route.params} />
-      {/* <SwitchHeader selected></SwitchHeader> */}
+    <SafeAreaView>
+      <View style={app.container}>
+        <Header title="Add" props={route.params} />
+        {/* <SwitchHeader selected></SwitchHeader> */}
+
+        <View style={switchHeader.header}>
+          <TouchableOpacity style={switchHeader.itemContainer}>
+            <Text style={switchHeader.itemText}>Add to existing</Text>
+            <View style={switchHeader.selected}></View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={switchHeader.itemContainer}
+            onPress={() => navigation.navigate("NewStory")}
+          >
+            <Text style={switchHeader.itemText}>Create new story</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
       <KeyboardAvoidingView
         // style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}
         behavior="padding"
         enabled
         keyboardVerticalOffset={0}
       >
-        <ScrollView style={{ height: "100%" }}>
-          <View style={switchHeader.header}>
-            <TouchableOpacity style={switchHeader.itemContainer}>
-              <Text style={switchHeader.itemText}>Add to existing</Text>
-              <View style={switchHeader.selected}></View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={switchHeader.itemContainer}
-              onPress={() => navigation.navigate("NewStory")}
-            >
-              <Text style={switchHeader.itemText}>Create new story</Text>
-            </TouchableOpacity>
-          </View>
+        <ScrollView style={app.container}>
           {/* <Buttontggo></Buttontggo> */}
 
           <SubTitle title="Select trip" />
@@ -151,10 +252,26 @@ const AddArticle = ({ route, navigation }: any) => {
               shadowRadius: 50,
               borderRadius: 8,
             }}
+            placeholder="Choose your trip"
+            onChange={setArticleStory}
+            value={articleStory}
           >
-            <Option value={1}>List item 1</Option>
-            <Option value={2}>List item 2</Option>
-            <Option value={3}>List item 3</Option>
+            {userStories ? (
+              userStories.map((array, index) => {
+                return (
+                  <Option
+                    key={index}
+                    value={array[0]}
+                    last={true}
+                    onPress={() => setArticleStory(array[0])}
+                  >
+                    {array[1]}
+                  </Option>
+                );
+              })
+            ) : (
+              <Option value={1}>No stories available</Option>
+            )}
           </Select>
           <SubTitle title="Story" />
           <View style={app.input}>
@@ -162,12 +279,16 @@ const AddArticle = ({ route, navigation }: any) => {
               placeholder="Title.."
               style={[story.title]}
               placeholderTextColor={color.gray}
+              onChangeText={setArticleTitle}
+              value={articleTitle}
             ></TextInput>
             <TextInput
               placeholder="Write your experience down here.."
               style={{ marginTop: 16 }}
               placeholderTextColor={color.gray}
               multiline={true}
+              onChangeText={setArticleNote}
+              value={articleNote}
             ></TextInput>
           </View>
           <SubTitle title="Add pictures" />
@@ -186,30 +307,29 @@ const AddArticle = ({ route, navigation }: any) => {
                 color={color.lightGray}
               />
             </TouchableOpacity>
-            {storyImages.map((image, index) => {
-              return (
-                <ArticleImage
-                  key={index}
-                  uri={image}
-                  onPress={() => {
-                    clickImage(index);
-                  }}
-                ></ArticleImage>
-              );
-            })}
-            {/* {image && (
-              <ArticleImage
-                key={5}
-                uri={image}
-                onPress={() => {
-                  clickImage(5);
-                }}
-              ></ArticleImage>
-            )} */}
+            {storyImages
+              ? storyImages.map((image, index) => {
+                  return (
+                    <ArticleImage
+                      key={index}
+                      uri={image}
+                      onPress={() => {
+                        clickImage(image);
+                      }}
+                    ></ArticleImage>
+                  );
+                })
+              : null}
           </ScrollView>
           <AppButton
             title="Add to story"
-            style={{ width: "50%", alignSelf: "flex-end" }}
+            style={{
+              width: "50%",
+              alignSelf: "flex-end",
+              marginTop: 16,
+              marginBottom: 200,
+            }}
+            onPress={() => addArticle()}
           />
         </ScrollView>
       </KeyboardAvoidingView>
