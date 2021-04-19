@@ -32,9 +32,8 @@ export const app = StyleSheet.create({
     marginVertical: 8,
 
     shadowColor: "black",
-    shadowOpacity: 0.05,
-    elevation: 50,
-    shadowRadius: 50,
+    shadowOpacity: 0.06,
+    shadowRadius: 25,
   },
   button: {
     backgroundColor: color.alpha,

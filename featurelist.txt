@@ -32,6 +32,7 @@ https://github.com/didinj/react-native-firebase-authentication-email-password/tr
 - App/User settings
 - - Upload profile pricture
 - - Update display name
+- - User profile name FROM table users not auth
 
 
 - FY, curated & top likes van deze dag
@@ -41,3 +42,9 @@ https://github.com/didinj/react-native-firebase-authentication-email-password/tr
 !! Error !!
 - Swipe back to old page => Foute pagina
 - Image kan niet gevonden worden op de server => bestaat wel
+
+
+API
+expo-location
+mapview
+firebase

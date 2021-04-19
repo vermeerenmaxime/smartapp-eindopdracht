@@ -16,7 +16,7 @@ import { app } from "../../styles/app";
 import { header } from "../../styles/components/header";
 import AppButton from "../../components/appButton";
 
-import firebase from "../../database/firebase";
+import { firebase, firestore } from "../../database/firebase";
 import { color } from "../../styles/colors";
 
 const Register = ({ navigation }: any) => {
@@ -38,6 +38,11 @@ const Register = ({ navigation }: any) => {
           res.user.updateProfile({
             displayName: username,
           });
+
+          firestore.collection("user").doc(res.user.userId).set({
+            displayName: res.user.displayName,
+          });
+
           console.log("User registered successfully!");
           setLoading(false);
           setUsername("");

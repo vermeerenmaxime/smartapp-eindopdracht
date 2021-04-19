@@ -63,8 +63,6 @@ const AddArticle = ({ route, navigation }: any) => {
 
   const [storyImages, setStoryImages] = useState([
     "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2F6%2F67%2FGeirangerfjord%252C_Norway_%2528Unsplash%2529.jpg%2F640px-Geirangerfjord%252C_Norway_%2528Unsplash%2529.jpg&f=1&nofb=1",
-    "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fcdn-image.travelandleisure.com%2Fsites%2Fdefault%2Ffiles%2Fstyles%2F1600x1000%2Fpublic%2F1509382317%2Flofoten-islands-norway-aurora-borealis-northern-lights-NORWAYLIGHTS1017.jpg%3Fitok%3Dhk8qG4bN&f=1&nofb=1",
-    "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia2.trover.com%2FT%2F55a9b58f198e44046000020a%2Ffixedw_large_4x.jpg&f=1&nofb=1",
   ]);
 
   const clickImage = (image: any) => {
@@ -276,7 +274,7 @@ const AddArticle = ({ route, navigation }: any) => {
               <Option value={1}>No stories available</Option>
             )}
           </Select>
-          <SubTitle title="Story" />
+          <SubTitle title="Article" />
           <View style={app.input}>
             <TextInput
               placeholder="Title.."

@@ -9,13 +9,9 @@ import {
   ScrollView,
   Alert,
   Image,
-  TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SubTitle from "../../components/subTitle";
-
-import { LinearGradient } from "expo-linear-gradient";
-import ParallaxScrollView from "react-native-parallax-scroll-view";
 
 import { app } from "../../styles/app";
 import { story } from "../../styles/components/story";
@@ -27,8 +23,6 @@ import { useFocusEffect } from "@react-navigation/native";
 
 import StoryModel from "../../models/Story";
 import ArticleModel from "../../models/Article";
-import AppButton from "../../components/appButton";
-import { Overlay } from "react-native-elements";
 
 const Stack = createStackNavigator();
 
@@ -40,14 +34,6 @@ const Story = ({ route, navigation }: any) => {
   const storyId = route.params.storyId;
 
   const [storyData, setStoryData] = useState<StoryModel>();
-  const [storyArticles, setStoryArticles] = useState<ArticleModel[]>([]);
-  const [storyAuthor, setStoryAuthor] = useState([]);
-  const [overlayStoryEditVisible, setOverlayStoryEditVisible] = useState(false);
-
-  const toggleStoryEditOverlay = () => {
-    setOverlayStoryEditVisible(!overlayStoryEditVisible);
-    // setoverlayImage(image);
-  };
 
   const getStory = (storyId: string) => {
     let storiesRef = firestore.collection("story");
@@ -66,41 +52,10 @@ const Story = ({ route, navigation }: any) => {
         console.log("Error getting documents: ", error);
       });
   };
-  const getStoryArticles = (storyId: string) => {
-    let storiesRef = firestore.collection("article");
-    storiesRef
-      .where("storyId", "==", storyId)
-      .get()
-      .then((query) => {
-        let articles: any = [];
-        query.forEach((doc) => {
-          let newArticle = {
-            id: doc.id,
-            title: doc.data().title,
-            // image: doc.data().image,
-            note: doc.data().note,
-          };
-
-          articles.push(newArticle);
-        });
-        setStoryArticles(articles);
-      })
-      .catch((error: any) => {
-        console.log("Error getting documents: ", error);
-      });
-  };
-
-  const getStoryAuthor = (storyId, author) => {
-    // TODO !
-  };
-
-  const updateStory = () => {};
-  const changeStoryImage = () => {};
 
   useFocusEffect(
     useCallback(() => {
       getStory(storyId);
-      getStoryArticles(storyId);
     }, [])
   );
   return (
@@ -155,7 +110,7 @@ const Story = ({ route, navigation }: any) => {
           {route.params.edit ? (
             <TouchableOpacity
               style={story.like}
-              onPress={() => toggleStoryEditOverlay()}
+              onPress={() => console.log("Edit")}
             >
               <FontAwesomeIcon
                 icon={faPencilAlt}
@@ -183,90 +138,7 @@ const Story = ({ route, navigation }: any) => {
           <Text style={story.title}>{storyData?.title}</Text>
           <Text>{storyData?.description}</Text>
         </View>
-        {storyArticles ? (
-          storyArticles.map((article, index) => {
-            return (
-              <View key={index}>
-                {route.params.edit ? (
-                  <SubTitle
-                    title={article.title}
-                    edit
-                    onPress={() => {
-                      navigation.navigate("EditArticle", {
-                        storyTitle: storyData?.title,
-                        articleId: article.id,
-                      });
-                    }}
-                  ></SubTitle>
-                ) : (
-                  <SubTitle title={article.title}></SubTitle>
-                )}
-
-                <Text>{article.note}</Text>
-                <ScrollView
-                  horizontal={true}
-                  style={[story.articleImages, app.scrollViewHorizontal]}
-                >
-                  <TouchableOpacity
-                    style={[story.articleImage]}
-                  ></TouchableOpacity>
-                </ScrollView>
-              </View>
-            );
-          })
-        ) : (
-          <View>
-            <Text>Deze trip heeft nog geen artikels</Text>
-          </View>
-        )}
       </View>
-      {route.params.edit ? (
-        <Overlay
-          isVisible={overlayStoryEditVisible}
-          onBackdropPress={toggleStoryEditOverlay}
-          overlayStyle={{
-            width: "80%",
-
-            padding: 0,
-            borderRadius: 12,
-            overflow: "hidden",
-          }}
-        >
-          <TouchableOpacity onPress={() => changeStoryImage()}>
-            <Image
-              source={{ uri: storyData?.image }}
-              style={{
-                alignSelf: "center",
-                borderTopLeftRadius: 12,
-                borderTopRightRadius: 12,
-                width: "100%",
-                height: 150,
-                shadowColor: "black",
-                shadowOpacity: 0.06,
-                shadowRadius: 25,
-                backgroundColor: "red",
-              }}
-            ></Image>
-          </TouchableOpacity>
-          <View style={{ padding: 16 }}>
-            <SubTitle title="Edit trip"></SubTitle>
-            <TextInput
-              style={app.input}
-              // onChangeText={setStoryTitle}
-              value={storyData?.title}
-              placeholder="Story title.."
-            />
-            <TextInput
-              style={[app.input, { minHeight: 100, paddingTop: 16 }]}
-              // onChangeText={setStoryDescription}
-              value={storyData?.description}
-              placeholder="Story description.."
-              multiline={true}
-            />
-            <AppButton onPress={() => updateStory()} title="Edit trip" />
-          </View>
-        </Overlay>
-      ) : null}
     </ScrollView>
   );
 };

@@ -18,7 +18,7 @@ import AppButton from "../../components/appButton";
 import { app } from "../../styles/app";
 import { header } from "../../styles/components/header";
 
-import {firebase} from "../../database/firebase";
+import { firestore, firebase } from "../../database/firebase";
 import { color } from "../../styles/colors";
 
 const Login = ({ route, navigation }: any) => {
@@ -26,16 +26,6 @@ const Login = ({ route, navigation }: any) => {
   const [password, setPassword] = useState("Eeeeee");
 
   const [loading, setLoading] = useState(false);
-
-  // const checkUserPermission = (email: string, password: string) => {
-  //   if (email == "maxime6128@gmail.com" && password == "E") {
-  //     navigation.navigate("TabNavigation", {
-  //       email: "maxime6128@gmail.com",
-  //     });
-  //   } else {
-  //     Alert.alert("Password is onjuist");
-  //   }
-  // };
 
   const userLogin = () => {
     if (email === "" && password === "") {
@@ -45,9 +35,13 @@ const Login = ({ route, navigation }: any) => {
       firebase
         .auth()
         .signInWithEmailAndPassword(email, password)
-        .then((res) => {
-          console.log(res);
-          console.log("User logged-in successfully!");
+        .then((res: any) => {
+
+          // console.log(res);
+          console.log(
+            "-- User successfully logged in : ",
+            res.user.displayName
+          );
           setLoading(false);
           setEmail("");
           setPassword("");

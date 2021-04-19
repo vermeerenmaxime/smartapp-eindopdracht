@@ -84,6 +84,7 @@ function CustomTabBar({ navigation, state, position }: any) {
 }
 
 interface UserModule {
+  uid: string;
   displayName: string;
   email: string;
   photoURL: string;
@@ -91,6 +92,7 @@ interface UserModule {
 export default function MainNavigation({ route, navigation }: any) {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState<UserModule>({
+    uid: "",
     displayName: "",
     email: "",
     photoURL: "",
@@ -100,7 +102,7 @@ export default function MainNavigation({ route, navigation }: any) {
     setUser(user);
     route.params.user = user;
     if (initializing) setInitializing(false);
-    console.log(route.params);
+    // console.log(route.params);
   };
 
   useEffect(() => {

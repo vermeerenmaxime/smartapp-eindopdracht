@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import Overview from "./Overview";
 import Story from "./Story";
+import EditArticle from "./EditArticle";
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ const Home = ({ route, navigation }: any) => {
         initialParams={route.params}
       ></Stack.Screen>
       <Stack.Screen name="Story" component={Story}></Stack.Screen>
+      <Stack.Screen name="EditArticle" component={EditArticle}></Stack.Screen>
     </Stack.Navigator>
   );
 };
