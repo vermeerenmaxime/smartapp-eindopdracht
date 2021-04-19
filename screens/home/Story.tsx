@@ -21,7 +21,7 @@ import { story } from "../../styles/components/story";
 
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHeart, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
-import { firestore } from "../../database/firebase";
+import { firebase, firestore } from "../../database/firebase";
 import { useFocusEffect } from "@react-navigation/native";
 
 import StoryModel from "../../models/Story";
@@ -166,7 +166,7 @@ const Story = ({ route, navigation }: any) => {
         </LinearGradient>
       </ImageBackground>
 
-      <View style={[app.container,{marginTop:32}]}>
+      <View style={[app.container, { marginTop: 32 }]}>
         <View>
           <Text style={story.title}>{storyData?.title}</Text>
           <Text>{storyData?.description}</Text>

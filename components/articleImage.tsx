@@ -12,8 +12,12 @@ import {
 import { app } from "../styles/app";
 import { story } from "../styles/components/story";
 
-const ArticleImage = ({ uri, onPress }: any) => (
-  <TouchableOpacity style={[story.articleImage]} onPress={onPress}>
+const ArticleImage = ({ uri, onPress, onLongPress }: any) => (
+  <TouchableOpacity
+    style={[story.articleImage]}
+    onPress={onPress}
+    onLongPress={onLongPress}
+  >
     <ImageBackground
       source={{
         uri: uri,

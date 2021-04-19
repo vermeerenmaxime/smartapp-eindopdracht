@@ -73,7 +73,9 @@ const AddArticle = ({ route, navigation }: any) => {
   };
 
   const deleteImage = (image: any) => {
-    delete storyImages[image];
+    console.log("Delete image:", image);
+
+    setStoryImages(storyImages.filter((item) => item !== image));
   };
 
   useEffect(() => {
@@ -88,7 +90,7 @@ const AddArticle = ({ route, navigation }: any) => {
       }
     })();
     setUserStories([]);
-    getUserStories();
+    // getUserStories();
   }, []);
 
   const pickImage = async () => {
@@ -157,6 +159,7 @@ const AddArticle = ({ route, navigation }: any) => {
           // setUserStories([...userStories, newStory]);
         });
         setUserStories(stories);
+        // console.log(userStories);
       })
       .catch((error: any) => {
         console.log("Error getting documents: ", error);
@@ -203,7 +206,7 @@ const AddArticle = ({ route, navigation }: any) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={switchHeader.itemContainer}
-            onPress={() => navigation.navigate("NewStory")}
+            onPress={() => navigation.navigate("AddStory")}
           >
             <Text style={switchHeader.itemText}>Create new story</Text>
           </TouchableOpacity>
@@ -316,6 +319,7 @@ const AddArticle = ({ route, navigation }: any) => {
                       onPress={() => {
                         clickImage(image);
                       }}
+                      onLongPress={() => deleteImage(image)}
                     ></ArticleImage>
                   );
                 })
