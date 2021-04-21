@@ -31,8 +31,8 @@ https://github.com/didinj/react-native-firebase-authentication-email-password/tr
 
 - App/User settings
 - - Upload profile pricture
-- - Update display name
-- - User profile name FROM table users not auth
+- - Update display name ✅
+- - User profile name FROM table users not auth ✅
 
 
 - FY, curated & top likes van deze dag

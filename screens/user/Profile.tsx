@@ -13,6 +13,11 @@ import AppButton from "../../components/appButton";
 import Header from "../../components/header";
 import StoryBig from "../../components/storyBig";
 import SubTitle from "../../components/subTitle";
+import {
+  userStories,
+  getStories,
+  userData,
+} from "../../database/databaseContext";
 // https://www.npmjs.com/package/react-native-parallax-scroll-view
 import { firebase, firestore } from "../../database/firebase";
 import StoryModel from "../../models/Story";
@@ -31,9 +36,6 @@ const Profile = ({ route, navigation }: any) => {
       })
       .catch((error: any) => alert(error));
   };
-
-  const [userStories, setUserStories] = useState<StoryModel[]>([]);
-
   // const createData = async () => {
   //   const story = firebase.firestore().collection("story");
   //   story.doc("TR").set({
@@ -50,44 +52,73 @@ const Profile = ({ route, navigation }: any) => {
   //   });
   // };
 
-  const getUserStories = () => {
-    var storiesRef = firestore.collection("story");
+  // const getUserStories = () => {
+  //   var storiesRef = firestore.collection("story");
 
-    storiesRef
-      .where("author", "==", route.params.user.uid)
-      .get()
-      .then((query) => {
-        let stories: any[] = [];
+  //   storiesRef
+  //     .where("author", "==", route.params.user.uid)
+  //     .get()
+  //     .then((query) => {
+  //       let stories: any[] = [];
 
-        query.forEach((doc) => {
-          let newStory = {
-            id: doc.id,
-            title: doc.data().title,
-            image: doc.data().image,
-            private: doc.data().private,
-          };
+  //       query.forEach((doc) => {
+  //         let newStory = {
+  //           id: doc.id,
+  //           title: doc.data().title,
+  //           image: doc.data().image,
+  //           private: doc.data().private,
+  //         };
 
-          stories.push(newStory);
+  //         stories.push(newStory);
 
-          // ! Dit zorgt ervoor dat ik maar 1 item te zien krijg ipv mijn hele lijst, vandaar de stories.push
-          // setUserStories([...userStories, newStory]);
+  //         // ! Dit zorgt ervoor dat ik maar 1 item te zien krijg ipv mijn hele lijst, vandaar de stories.push
+  //         // setUserStories([...userStories, newStory]);
+  //       });
+  //       setUserStories(stories);
+  //     })
+  //     .catch((error: any) => {
+  //       console.log("Error getting documents: ", error);
+  //     });
+  // };
+
+  const Stories = (published: boolean = true) => {
+    let userStoriesData = getStories();
+
+    const html = [];
+
+    if (userStoriesData) {
+      if (published) {
+        userStories.map((data, index) => {
+          if (data.private && data.image && data.title) {
+            html.push(
+              <StoryBig
+                key={index}
+                title={data.title}
+                image={data.image}
+                onPress={() =>
+                  navigation.navigate("Story", {
+                    storyId: data.id,
+                    edit: true,
+                  })
+                }
+              />
+            );
+          }
         });
-        setUserStories(stories);
-      })
-      .catch((error: any) => {
-        console.log("Error getting documents: ", error);
-      });
+      }
+    } else {
+      html.push(<Text>Geen trips gevonden</Text>);
+    }
+
+    return html;
   };
-
-  const renderStories = () => {};
-
   // useEffect(() => {
   //   createData();
   //   fetchStories();
   // }, []);
   useFocusEffect(
     useCallback(() => {
-      getUserStories();
+      // getUserStories();
     }, [])
   );
 
@@ -96,33 +127,16 @@ const Profile = ({ route, navigation }: any) => {
       <ScrollView style={app.container}>
         <Header
           title="Profile"
-          subTitle={route.params.user.displayName}
+          subTitle={userData?.displayName}
           props={route.params}
         />
         <SubTitle title="Work in progress" />
-        {userStories ? (
-          userStories.map((data, index) => {
-            if (data.private && data.image && data.title) {
-              return (
-                <StoryBig
-                  key={index}
-                  title={data.title}
-                  image={data.image}
-                  onPress={() =>
-                    navigation.navigate("Story", {
-                      storyId: data.id,
-                      edit: true,
-                    })
-                  }
-                />
-              );
-            }
-          })
-        ) : (
-          <Text>You don't have anything work in progress.</Text>
-        )}
+
+        {Stories()}
+
         <SubTitle title="Published trips" />
-        {userStories ? (
+        {() => Stories(false)}
+        {/* {userStories ? (
           userStories.map((data, index) => {
             if (!data.private && data.image && data.title) {
               return (
@@ -142,7 +156,7 @@ const Profile = ({ route, navigation }: any) => {
           })
         ) : (
           <Text>You don't have any published stories yet.</Text>
-        )}
+        )} */}
 
         <AppButton onPress={() => signOut()} title="Logout" />
       </ScrollView>

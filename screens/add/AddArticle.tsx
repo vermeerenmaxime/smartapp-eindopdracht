@@ -39,6 +39,7 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import { firestore } from "../../database/firebase";
 import ArticleModel from "../../models/Article";
+import { userData } from "../../database/databaseContext";
 
 const AddArticle = ({ route, navigation }: any) => {
   const [visible, setVisible] = useState(false);
@@ -133,38 +134,38 @@ const AddArticle = ({ route, navigation }: any) => {
   //     });
   // };
 
-  const getUserStories = () => {
-    var storiesRef = firestore.collection("story");
+  // const getUserStories = () => {
+  //   var storiesRef = firestore.collection("story");
 
-    storiesRef
-      .where("author", "==", route.params.user.uid)
-      .get()
-      .then((query) => {
-        let stories: any[] = [];
+  //   storiesRef
+  //     .where("author", "==", route.params.user.uid)
+  //     .get()
+  //     .then((query) => {
+  //       let stories: any[] = [];
 
-        query.forEach((doc) => {
-          let newStory = {
-            id: doc.id,
-            title: doc.data().title,
-            image: doc.data().image,
-          };
+  //       query.forEach((doc) => {
+  //         let newStory = {
+  //           id: doc.id,
+  //           title: doc.data().title,
+  //           image: doc.data().image,
+  //         };
 
-          stories.push(newStory);
+  //         stories.push(newStory);
 
-          // ! Dit zorgt ervoor dat ik maar 1 item te zien krijg ipv mijn hele lijst, vandaar de stories.push
-          // setUserStories([...userStories, newStory]);
-        });
-        setUserStories(stories);
-        // console.log(userStories);
-      })
-      .catch((error: any) => {
-        console.log("Error getting documents: ", error);
-      });
-  };
+  //         // ! Dit zorgt ervoor dat ik maar 1 item te zien krijg ipv mijn hele lijst, vandaar de stories.push
+  //         // setUserStories([...userStories, newStory]);
+  //       });
+  //       setUserStories(stories);
+  //       // console.log(userStories);
+  //     })
+  //     .catch((error: any) => {
+  //       console.log("Error getting documents: ", error);
+  //     });
+  // };
 
   const addArticle = () => {
     console.log("woop");
-    let imageName = `article-${route.params.user.uid}-${new Date().getTime()}`;
+    let imageName = `article-${userData?.uid}-${new Date().getTime()}`;
     // await uploadImage(storyImage, imageName)
     //   .then(async () => {
     //     await getImageFromUpload(imageName);

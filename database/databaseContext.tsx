@@ -46,8 +46,17 @@ export const updateUserData = (data: UserModel) => {
   });
 };
 
-export let userStory = [{}];
-export const getStories = (storyId: string) => {
+export let userStories: Array<StoryModel> = [
+  {
+    author: "",
+    description: "",
+    image: "",
+    likes: "",
+    private: true,
+    title: "",
+  },
+];
+export const getStories = (fromUser: boolean = true) => {
   let stories: Array<StoryModel> = [
     {
       author: "",
@@ -58,25 +67,80 @@ export const getStories = (storyId: string) => {
       title: "",
     },
   ];
+  const storiesRef = firestore.collection("story");
+  if (fromUser) {
+    storiesRef
+      .where("author", "==", userData.uid)
+      .get()
+      .then((query) => {
+        query.forEach((doc) => {
+
+          let newStory: StoryModel = {
+            id: doc.id,
+            title: doc.data().title,
+            image: doc.data().image,
+            private: doc.data().private,
+            author: doc.data().author,
+            description: doc.data().description,
+            likes: doc.data().likes,
+            lat: doc.data().lat,
+            long: doc.data().long,
+          };
+          userStories.push(newStory);
+        });
+      })
+      .catch((error: any) => {
+        console.log("Error getting documents: ", error);
+      });
+    return userStories;
+  } else {
+    storiesRef
+      .get()
+      .then((query) => {
+        query.forEach((doc) => {
+          let newStory: StoryModel = {
+            id: doc.id,
+            title: doc.data().title,
+            image: doc.data().image,
+            private: doc.data().private,
+            author: doc.data().author,
+            description: doc.data().description,
+            likes: doc.data().likes,
+            lat: doc.data().lat,
+            long: doc.data().long,
+          };
+          stories.push(newStory);
+        });
+      })
+      .catch((error: any) => {
+        console.log("Error getting documents: ", error);
+      });
+    return stories;
+  }
 
   return stories;
 };
+export const getStory = (storyId: string) => {
+  let story: StoryModel = {
+    author: "",
+    description: "",
+    image: "",
+    likes: "",
+    private: true,
+    title: "",
+  };
+  return story;
+};
 export const addStory = (newStory: StoryModel) => {
-  if (newStory) {
-    userStory.push({
-      // uid: data.uid,
-      // displayName: data.displayName,
-      // email: data.email,
-      // photoURL: data.photoURL,
-    });
-  }
-  return userStory;
+  
+  
+  return userStories;
 };
 export const editStory = (story: StoryModel) => {
-  return userStory;
+  return userStories;
 };
 export const deleteStory = (story: StoryModel) => {
-  return userStory;
+  return userStories;
 };
 
 // export const getUserData = userData[0];

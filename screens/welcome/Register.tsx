@@ -18,6 +18,7 @@ import AppButton from "../../components/appButton";
 
 import { firebase, firestore } from "../../database/firebase";
 import { color } from "../../styles/colors";
+import { setUserData } from "../../database/databaseContext";
 
 const Register = ({ navigation }: any) => {
   const [username, setUsername] = useState("Maxime");
@@ -25,6 +26,8 @@ const Register = ({ navigation }: any) => {
   const [password, setPassword] = useState("E");
 
   const [loading, setLoading] = useState(false);
+
+  
 
   const registerUser = () => {
     if (email === "" && password === "") {
@@ -48,6 +51,9 @@ const Register = ({ navigation }: any) => {
           setUsername("");
           setPassword("");
           setEmail("");
+
+          setUserData(res.user);
+          
           navigation.navigate("TabNavigation", {
             email: "test",
           });

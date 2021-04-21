@@ -85,81 +85,50 @@ function CustomTabBar({ navigation, state, position }: any) {
 }
 
 export default function MainNavigation({ route, navigation }: any) {
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState<UserModule>({
-    uid: "",
-    displayName: "",
-    email: "",
-    photoURL: "",
-  });
+  return (
+    <Tab.Navigator
+      // tabBar={(props) => <CustomTabBar {...props} />}
+      // screenOptions={customTabOptions}
+      tabBarOptions={{
+        inactiveTintColor: "white",
+        activeTintColor: "#59D999",
 
-  const onAuthStateChanged = (user: any) => {
-    setUser(user);
-    route.params.user = user;
-    if (initializing) setInitializing(false);
-    // console.log(route.params);
-  };
+        tabStyle: {},
+        safeAreaInsets: {
+          //bottom:0
+        },
+        style: {
+          borderTopWidth: 0,
+          backgroundColor: "#312F2F",
+        },
+        labelStyle: {
+          fontSize: 16,
+          fontWeight: "bold",
+        },
+      }}
+    >
+      <Tab.Screen
+        name="home"
+        component={Home}
+        initialParams={route.params}
+        // options={{
+        //   title: "",
 
-  useEffect(() => {
-    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
-  }, []);
-
-  if (initializing) return null;
-  else {
-    if (!user) {
-      return navigation.navigate("Login");
-    } else {
-      return (
-        <Tab.Navigator
-          // tabBar={(props) => <CustomTabBar {...props} />}
-          // screenOptions={customTabOptions}
-          tabBarOptions={{
-            inactiveTintColor: "white",
-            activeTintColor: "#59D999",
-
-            tabStyle: {},
-            safeAreaInsets: {
-              //bottom:0
-            },
-            style: {
-              borderTopWidth: 0,
-              backgroundColor: "#312F2F",
-            },
-            labelStyle: {
-              fontSize: 16,
-              fontWeight: "bold",
-            },
-          }}
-        >
-          <Tab.Screen
-            name="home"
-            component={Home}
-            initialParams={route.params}
-            // options={{
-            //   title: "",
-
-            //   tabBarIcon: ({ size, focused }) => {
-            //     return (
-            //       <FontAwesomeIcon
-            //         icon={faHome}
-            //         style={{ color: color.alpha }}
-            //         size={16}
-            //       ></FontAwesomeIcon>
-            //     );
-            //   },
-            // }}
-          />
-          <Tab.Screen name="fy" component={Fy} />
-          <Tab.Screen name="+" component={Add} initialParams={route.params} />
-          <Tab.Screen name="map" component={Map} initialParams={route.params} />
-          <Tab.Screen
-            name="user"
-            component={User}
-            initialParams={route.params}
-          />
-        </Tab.Navigator>
-      );
-    }
-  }
+        //   tabBarIcon: ({ size, focused }) => {
+        //     return (
+        //       <FontAwesomeIcon
+        //         icon={faHome}
+        //         style={{ color: color.alpha }}
+        //         size={16}
+        //       ></FontAwesomeIcon>
+        //     );
+        //   },
+        // }}
+      />
+      <Tab.Screen name="fy" component={Fy} />
+      <Tab.Screen name="+" component={Add} initialParams={route.params} />
+      <Tab.Screen name="map" component={Map} initialParams={route.params} />
+      <Tab.Screen name="user" component={User} initialParams={route.params} />
+    </Tab.Navigator>
+  );
 }

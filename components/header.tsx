@@ -15,14 +15,13 @@ import SubTitle from "./subTitle";
 import { userData } from "../database/databaseContext";
 
 const Header = ({ title, subTitle, props }: any) => {
-  const [displayName, setDisplayName] = useState(props.user.displayName);
   const [email, setEmail] = useState("");
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [newUserData, setNewUserDataNew] = useState<UserModel>(userData);
 
   const updateUser = () => {
-    console.log("update", props.user.uid);
-    firestore.collection("user").doc(props.user.uid).update({
+    console.log("update", userData?.uid);
+    firestore.collection("user").doc(userData?.uid).update({
       displayName: newUserData.displayName,
       email: newUserData.email,
       photoURL: newUserData.photoURL,
@@ -40,9 +39,7 @@ const Header = ({ title, subTitle, props }: any) => {
     // console.log(props.user.photoURL);
   };
 
-  const changeProfilePicture = () => {
-    
-  };
+  const changeProfilePicture = () => {};
 
   return (
     <View style={header.container}>
