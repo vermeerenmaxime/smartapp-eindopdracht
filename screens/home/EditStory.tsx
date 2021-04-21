@@ -23,6 +23,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 import StoryModel from "../../models/Story";
 import ArticleModel from "../../models/Article";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Stack = createStackNavigator();
 

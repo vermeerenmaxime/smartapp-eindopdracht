@@ -9,25 +9,44 @@ import SubTitle from "../../components/subTitle";
 
 import { app } from "../../styles/app";
 import StorySmall from "../../components/storySmall";
+import { userData } from "../../database/databaseContext";
 
 const Stack = createStackNavigator();
 
 const Overview = ({ route, navigation }: any) => {
-
   return (
     <SafeAreaView style={app.container}>
       <Header title="Home" props={route.params} />
+      <Text>{userData.email}</Text>
       <SubTitle title="Trending on Travler" />
       <ScrollView horizontal={true} style={app.scrollViewHorizontal}>
-        <StorySmall title="Norway Trip 2021" onPress={() => navigation.navigate("Story", { storyId: 1 })}/>
-        <StorySmall title="Norway Trip 2021" onPress={() => navigation.navigate("Story", { storyId: 1 })}/>
-        <StorySmall title="Norway Trip 2021" onPress={() => navigation.navigate("Story", { storyId: 1 })}/>
+        <StorySmall
+          title="Norway Trip 2021"
+          onPress={() => navigation.navigate("Story", { storyId: 1 })}
+        />
+        <StorySmall
+          title="Norway Trip 2021"
+          onPress={() => navigation.navigate("Story", { storyId: 1 })}
+        />
+        <StorySmall
+          title="Norway Trip 2021"
+          onPress={() => navigation.navigate("Story", { storyId: 1 })}
+        />
       </ScrollView>
       <SubTitle title="Verified stories" />
       <ScrollView horizontal={true} style={app.scrollViewHorizontal}>
-        <StorySmall title="Norway Trip 2021" onPress={() => navigation.navigate("Story", { storyId: 1 })}/>
-        <StorySmall title="Norway Trip 2021" onPress={() => navigation.navigate("Story", { storyId: 1 })}/>
-        <StorySmall title="Norway Trip 2021" onPress={() => navigation.navigate("Story", { storyId: 1 })}/>
+        <StorySmall
+          title="Norway Trip 2021"
+          onPress={() => navigation.navigate("Story", { storyId: 1 })}
+        />
+        <StorySmall
+          title="Norway Trip 2021"
+          onPress={() => navigation.navigate("Story", { storyId: 1 })}
+        />
+        <StorySmall
+          title="Norway Trip 2021"
+          onPress={() => navigation.navigate("Story", { storyId: 1 })}
+        />
       </ScrollView>
     </SafeAreaView>
   );

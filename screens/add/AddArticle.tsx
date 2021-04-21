@@ -17,32 +17,28 @@ import {
 import { Select, Option } from "react-native-select-lists";
 // https://www.npmjs.com/package/react-native-lists-select
 
-// ! FIREBASE FILE UPLOAD
-// https://www.youtube.com/watch?v=GEtqS9Qozv4
-// https://www.pluralsight.com/guides/upload-images-to-firebase-storage-in-react-native
-
 import * as ImagePicker from "expo-image-picker";
 import Constants from "expo-constants";
 
 import { Button, Overlay } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { app } from "../../styles/app";
+import { color } from "../../styles/colors";
+import { switchHeader } from "../../styles/components/switchHeader";
+import { story } from "../../styles/components/story";
+
 import Header from "../../components/header";
 import SubTitle from "../../components/subTitle";
 import ArticleImage from "../../components/articleImage";
-
-import { app } from "../../styles/app";
-import { color } from "../../styles/colors";
 import SwitchHeader from "../../components/switchHeader";
-import { switchHeader } from "../../styles/components/switchHeader";
 import AppButton from "../../components/appButton";
-import { story } from "../../styles/components/story";
 
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { firestore } from "../../database/firebase";
 
-const Stack = createStackNavigator();
+import { firestore } from "../../database/firebase";
+import ArticleModel from "../../models/Article";
 
 const AddArticle = ({ route, navigation }: any) => {
   const [visible, setVisible] = useState(false);
@@ -53,6 +49,8 @@ const AddArticle = ({ route, navigation }: any) => {
   const [articleStory, setArticleStory] = useState("");
   const [articleTitle, setArticleTitle] = useState("");
   const [articleNote, setArticleNote] = useState("");
+
+  const [articleData, setArticleData] = useState<ArticleModel>();
 
   // const [story, setStory] = useState<Story[]>([]);
 
@@ -220,6 +218,7 @@ const AddArticle = ({ route, navigation }: any) => {
           {/* <Buttontggo></Buttontggo> */}
 
           <SubTitle title="Select trip" />
+          {console.log(route.params.storyId)}
           {/* <TextInput
             style={app.input}
             // onChangeText={}

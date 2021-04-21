@@ -8,19 +8,26 @@ import { Button, Overlay } from "react-native-elements";
 import { app } from "../styles/app";
 
 import { header } from "../styles/components/header";
+import UserModel from "../models/User";
+
 import AppButton from "./appButton";
 import SubTitle from "./subTitle";
+import { userData } from "../database/databaseContext";
 
 const Header = ({ title, subTitle, props }: any) => {
   const [displayName, setDisplayName] = useState(props.user.displayName);
   const [email, setEmail] = useState("");
   const [overlayVisible, setOverlayVisible] = useState(false);
+  const [newUserData, setNewUserDataNew] = useState<UserModel>(userData);
 
   const updateUser = () => {
     console.log("update", props.user.uid);
     firestore.collection("user").doc(props.user.uid).update({
-      displayName: displayName,
+      displayName: newUserData.displayName,
+      email: newUserData.email,
+      photoURL: newUserData.photoURL,
     });
+    toggleOverlay();
   };
 
   const toggleOverlay = () => {
@@ -33,7 +40,9 @@ const Header = ({ title, subTitle, props }: any) => {
     // console.log(props.user.photoURL);
   };
 
-  const changeProfilePicture = () => {};
+  const changeProfilePicture = () => {
+    
+  };
 
   return (
     <View style={header.container}>
@@ -53,10 +62,9 @@ const Header = ({ title, subTitle, props }: any) => {
             <Image
               style={header.avatarImage}
               // source={require("../assets/favicon.png")}
-
               source={{
-                uri: props.user.photoURL
-                  ? props.user.photoURL
+                uri: newUserData.photoURL
+                  ? newUserData.photoURL
                   : "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fstartyoungfinancial.com%2Fwp-content%2Fuploads%2F2015%2F05%2Fdefault-image.png&f=1&nofb=1",
               }}
             />
@@ -76,7 +84,7 @@ const Header = ({ title, subTitle, props }: any) => {
       >
         <TouchableOpacity onPress={() => changeProfilePicture()}>
           <Image
-            source={{ uri: props.user.photoURL }}
+            source={{ uri: newUserData.photoURL }}
             style={{
               alignSelf: "center",
               borderRadius: 100,
@@ -93,14 +101,24 @@ const Header = ({ title, subTitle, props }: any) => {
         <SubTitle title="Profile settings"></SubTitle>
         <TextInput
           style={app.input}
-          onChangeText={setDisplayName}
-          value={displayName}
+          onChangeText={(text: string) => {
+            setNewUserDataNew((oldUser: UserModel) => {
+              oldUser.displayName = text;
+              return { ...oldUser };
+            });
+          }}
+          value={newUserData.displayName}
           placeholder="Username.."
         />
         <TextInput
           style={app.input}
-          onChangeText={setEmail}
-          value={email}
+          onChangeText={(text: string) => {
+            setNewUserDataNew((oldUser: UserModel) => {
+              oldUser.email = text;
+              return { ...oldUser };
+            });
+          }}
+          value={newUserData.email}
           placeholder="Email.."
         />
         <AppButton onPress={() => updateUser()} title="Update" />

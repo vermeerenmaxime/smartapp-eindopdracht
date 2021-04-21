@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
 import { color } from "./colors";
 
-
 export const app = StyleSheet.create({
   container: {
     // paddingVertical: 16,
@@ -47,6 +46,8 @@ export const app = StyleSheet.create({
     shadowOpacity: 0.05,
     elevation: 50,
     shadowRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonText: {
     fontSize: 18,
@@ -55,11 +56,12 @@ export const app = StyleSheet.create({
 
     alignSelf: "center",
   },
+  buttonRed: { backgroundColor: color.red },
   signUp: {
     // width: "100%",
     textAlign: "center",
     padding: 12,
-    
+
     // textDecoration:"underline",
   },
 });

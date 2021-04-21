@@ -23,6 +23,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 
 import { faHome } from "@fortawesome/free-solid-svg-icons";
 import { firebase, firestore } from "../database/firebase";
+import UserModule from "../models/User";
 
 function Fy({}) {
   return <Text>fy</Text>;
@@ -83,12 +84,6 @@ function CustomTabBar({ navigation, state, position }: any) {
   );
 }
 
-interface UserModule {
-  uid: string;
-  displayName: string;
-  email: string;
-  photoURL: string;
-}
 export default function MainNavigation({ route, navigation }: any) {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState<UserModule>({
@@ -157,7 +152,7 @@ export default function MainNavigation({ route, navigation }: any) {
           />
           <Tab.Screen name="fy" component={Fy} />
           <Tab.Screen name="+" component={Add} initialParams={route.params} />
-          <Tab.Screen name="map" component={Map} />
+          <Tab.Screen name="map" component={Map} initialParams={route.params} />
           <Tab.Screen
             name="user"
             component={User}

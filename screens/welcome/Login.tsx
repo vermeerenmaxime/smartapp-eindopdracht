@@ -19,6 +19,11 @@ import { app } from "../../styles/app";
 import { header } from "../../styles/components/header";
 
 import { firestore, firebase } from "../../database/firebase";
+import {
+  userData,
+  setUserData,
+  UserDataContext,
+} from "../../database/databaseContext";
 import { color } from "../../styles/colors";
 
 const Login = ({ route, navigation }: any) => {
@@ -36,7 +41,6 @@ const Login = ({ route, navigation }: any) => {
         .auth()
         .signInWithEmailAndPassword(email, password)
         .then((res: any) => {
-
           // console.log(res);
           console.log(
             "-- User successfully logged in : ",
@@ -45,6 +49,10 @@ const Login = ({ route, navigation }: any) => {
           setLoading(false);
           setEmail("");
           setPassword("");
+
+          setUserData(res.user);
+          // console.log(userData[0]);
+
           navigation.navigate("TabNavigation", {
             // user: res.user,
           });

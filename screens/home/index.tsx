@@ -16,8 +16,16 @@ const Home = ({ route, navigation }: any) => {
         component={Overview}
         initialParams={route.params}
       ></Stack.Screen>
-      <Stack.Screen name="Story" component={Story}></Stack.Screen>
-      <Stack.Screen name="EditArticle" component={EditArticle}></Stack.Screen>
+      <Stack.Screen
+        name="Story"
+        component={Story}
+        initialParams={route.params}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="EditArticle"
+        component={EditArticle}
+        initialParams={route.params}
+      ></Stack.Screen>
     </Stack.Navigator>
   );
 };

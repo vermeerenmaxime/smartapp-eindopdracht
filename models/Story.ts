@@ -6,6 +6,7 @@ export default interface StoryModel {
   author: string
   description: string
   image: string
+  imageName?: string
   likes: string
   private: boolean
   title: string

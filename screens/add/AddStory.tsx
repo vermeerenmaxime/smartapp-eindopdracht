@@ -32,29 +32,21 @@ import AppButton from "../../components/appButton";
 import { firebase, firestore } from "../../database/firebase";
 import StoryModel from "../../models/Story";
 
-const Stack = createStackNavigator();
-
 const AddStory = ({ route, navigation }: any) => {
   const [storyPrivate, setStoryPrivate] = useState(false);
 
   const [storyTitle, setStoryTitle] = useState("");
   const [storyDescription, setStoryDescription] = useState("");
   const [storyImage, setStoryImage] = useState("");
-  const [storyImageUrl, setStoryImageUrl] = useState();
+  const [storyImageUrl, setStoryImageUrl] = useState("");
   const [storyAuthor, setStoryAuthor] = useState(route.params.user.uid);
-
-  // const [storyData, setStoryData] = useState<StoryModel>({
-  //   title: "",
-  //   image: "",
-  //   description: "",
-  // });
 
   const [storyData, setStoryData] = useState<StoryModel>({
     author: "",
     description: "",
     image: "",
     likes: "0",
-    private: false,
+    private: true,
     title: "",
   });
 
@@ -69,10 +61,9 @@ const AddStory = ({ route, navigation }: any) => {
         }
       }
     })();
-    // setStoryPrivate(false);
-    // setStoryImage("");
-    // setStoryTitle("");
-    // setStoryDescription("");
+    setStoryTitle("");
+    setStoryDescription("");
+    setStoryImage("");
   }, []);
 
   const pickImage = async () => {
@@ -103,22 +94,6 @@ const AddStory = ({ route, navigation }: any) => {
       .ref()
       .child("images/" + imageName);
 
-    // let metaData = {
-    //   customMetadata: {
-    //     location: "Yosemite, CA, USA",
-    //     activity: "Hiking",
-    //   },
-    // };
-
-    // ref
-    //   .updateMetadata(metaData)
-    //   .then((metadata) => {
-    //     console.log(metadata, "has been updated");
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-
     return await ref.put(blob);
   };
 
@@ -127,11 +102,13 @@ const AddStory = ({ route, navigation }: any) => {
     let storageRef = storage.ref();
     let starsRef = storageRef.child("images/" + imageName);
 
-    await starsRef
+    // Geen await anders geeft hij geen url
+    starsRef
       .getDownloadURL()
-      .then((url: any) => {
-        console.log("(url) ", storyImageUrl);
+      .then((url:string) => {
+        console.log(url);
         setStoryImageUrl(url);
+        console.log("(url) ", storyImageUrl);
       })
       .catch((error) => {
         console.log("error", error);
@@ -145,37 +122,34 @@ const AddStory = ({ route, navigation }: any) => {
       console.log("StoryImage      =>", storyImage);
       console.log("ImageName       =>", imageName);
 
-      // await getImageFromUpload(
-      //   "story-2JvTQVISdihsVOFE9fXcGb4erer2-1618750532421"
-      // );
-
       await uploadImage(storyImage, imageName)
         .then(async () => {
           console.log("-- Image uploaded --");
-
-          await getImageFromUpload(imageName);
-          console.log("StoryimageUrl    =>", storyImageUrl);
-
-          const newStoryRef = firestore.collection("story");
-          await newStoryRef
-            .add({
-              description: storyDescription,
-              title: storyTitle,
-              image: storyImageUrl,
-              author: storyAuthor,
-              likes: "0",
-              private: storyPrivate,
-            })
-            .then((doc) => {
-              console.log("Story succesfully created!");
-              navigation.navigate("Story", { storyId: doc.id });
-            })
-            .catch((error) => {
-              console.error("Error writing document: ", error);
-            });
         })
         .catch((error) => {
           Alert.alert(error);
+        });
+
+      getImageFromUpload(imageName);
+      console.log("StoryimageUrl    =>", storyImageUrl);
+
+      const newStoryRef = firestore.collection("story");
+      await newStoryRef
+        .add({
+          description: storyDescription,
+          title: storyTitle,
+          image: storyImageUrl,
+          imageName: imageName,
+          author: storyAuthor,
+          likes: "0",
+          private: storyPrivate,
+        })
+        .then((doc) => {
+          console.log("Story succesfully created!");
+          navigation.navigate("Story", { storyId: doc.id });
+        })
+        .catch((error) => {
+          console.error("Error writing document: ", error);
         });
     } else {
       Alert.alert("Please fill in all fields");
@@ -208,13 +182,6 @@ const AddStory = ({ route, navigation }: any) => {
           <SubTitle title="Name trip" />
           <TextInput
             style={app.input}
-            // onChangeText={(title: string) => {
-            //   setStoryData((oldNote: StoryModel) => {
-            //     oldNote.title = title;
-            //     return { ...oldNote };
-            //   });
-            // }}
-            // value={storyData?.title}
             onChangeText={setStoryTitle}
             value={storyTitle}
             placeholder="Tripname.."
