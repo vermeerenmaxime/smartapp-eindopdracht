@@ -1,80 +1,84 @@
-import React, { createContext, useContext, useState } from "react";
-import StoryModel from "../models/Story";
-import UserModel from "../models/User";
-import { firestore } from "./firebase";
+import React, { createContext, useContext, useState } from 'react'
+import StoryModel from '../models/Story'
+import UserModel from '../models/User'
+import { firestore } from './firebase'
 
 // const userStories: any = [{}];
 
 // const userStoriesContext = useContext(userStories);
 
 export let userData: UserModel = {
-  uid: "",
-  displayName: "",
-  email: "",
-  photoURL: "",
-};
+  uid: '',
+  displayName: '',
+  email: '',
+  photoURL: ''
+}
 
 export let userFromDatabase: UserModel = {
-  uid: "",
-  displayName: "",
-  email: "",
-  photoURL: "",
-};
+  uid: '',
+  displayName: '',
+  email: '',
+  photoURL: ''
+}
 
 export const setUserData = (data: UserModel) => {
   userData = {
     uid: data.uid,
     displayName: data.displayName,
     email: data.email,
-    photoURL: data.photoURL,
-  };
-  return userData;
-};
+    photoURL: data.photoURL
+  }
+  return userData
+}
 export const getUserData = () => {
   const userDataFromFirestore: UserModel = firestore
-    .collection("user")
+    .collection('user')
     .doc(userData.uid)
-    .get();
+    .get()
 
-  userFromDatabase = userDataFromFirestore;
+  userFromDatabase = userDataFromFirestore
 
-  return userFromDatabase;
-};
+  return userFromDatabase
+}
 export const updateUserData = (data: UserModel) => {
-  firestore.collection("user").doc(userData.uid).update({
-    displayName: data.displayName,
-  });
-};
+  firestore
+    .collection('user')
+    .doc(userData.uid)
+    .update({
+      displayName: data.displayName
+    })
+}
 
 export let userStories: Array<StoryModel> = [
   {
-    author: "",
-    description: "",
-    image: "",
-    likes: "",
+    author: '',
+    description: '',
+    image: '',
+    likes: '',
     private: true,
-    title: "",
-  },
-];
+    title: ''
+  }
+]
 export const getStories = (fromUser: boolean = true) => {
   let stories: Array<StoryModel> = [
     {
-      author: "",
-      description: "",
-      image: "",
-      likes: "",
+      author: '',
+      description: '',
+      image: '',
+      likes: '',
       private: true,
-      title: "",
-    },
-  ];
-  const storiesRef = firestore.collection("story");
-  if (fromUser) {
-    storiesRef
-      .where("author", "==", userData.uid)
-      .get()
-      .then((query) => {
-        query.forEach((doc) => {
+      title: ''
+    }
+  ]
+  const storiesRef = firestore.collection('story')
 
+  if (fromUser) {
+    userStories = []
+    storiesRef
+      .where('author', '==', userData.uid)
+      .get()
+      .then(query => {
+        query.forEach(doc => {
           let newStory: StoryModel = {
             id: doc.id,
             title: doc.data().title,
@@ -84,20 +88,20 @@ export const getStories = (fromUser: boolean = true) => {
             description: doc.data().description,
             likes: doc.data().likes,
             lat: doc.data().lat,
-            long: doc.data().long,
-          };
-          userStories.push(newStory);
-        });
+            long: doc.data().long
+          }
+          userStories.push(newStory)
+        })
       })
       .catch((error: any) => {
-        console.log("Error getting documents: ", error);
-      });
-    return userStories;
+        console.log('Error getting documents: ', error)
+      })
+    return userStories
   } else {
     storiesRef
       .get()
-      .then((query) => {
-        query.forEach((doc) => {
+      .then(query => {
+        query.forEach(doc => {
           let newStory: StoryModel = {
             id: doc.id,
             title: doc.data().title,
@@ -107,41 +111,37 @@ export const getStories = (fromUser: boolean = true) => {
             description: doc.data().description,
             likes: doc.data().likes,
             lat: doc.data().lat,
-            long: doc.data().long,
-          };
-          stories.push(newStory);
-        });
+            long: doc.data().long
+          }
+          stories.push(newStory)
+        })
       })
       .catch((error: any) => {
-        console.log("Error getting documents: ", error);
-      });
-    return stories;
+        console.log('Error getting documents: ', error)
+      })
+    return stories
   }
-
-  return stories;
-};
+}
 export const getStory = (storyId: string) => {
   let story: StoryModel = {
-    author: "",
-    description: "",
-    image: "",
-    likes: "",
+    author: '',
+    description: '',
+    image: '',
+    likes: '',
     private: true,
-    title: "",
-  };
-  return story;
-};
+    title: ''
+  }
+  return story
+}
 export const addStory = (newStory: StoryModel) => {
-  
-  
-  return userStories;
-};
+  return userStories
+}
 export const editStory = (story: StoryModel) => {
-  return userStories;
-};
+  return userStories
+}
 export const deleteStory = (story: StoryModel) => {
-  return userStories;
-};
+  return userStories
+}
 
 // export const getUserData = userData[0];
 

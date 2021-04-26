@@ -1,8 +1,8 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
-import AddArticle from "./AddArticle";
-import AddStory from "./AddStory";
+import AddArticle from "../home/AddArticle";
+import AddStory from "../home/AddStory";
 
 const Stack = createStackNavigator();
 

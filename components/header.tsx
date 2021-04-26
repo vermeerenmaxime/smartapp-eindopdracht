@@ -1,50 +1,53 @@
-import { firebase, firestore } from "../database/firebase";
+import { firebase, firestore } from '../database/firebase'
 
 // import firebase from "firebase";
-import React, { useState } from "react";
+import React, { useState } from 'react'
 
-import { Text, TouchableOpacity, View, Image, TextInput } from "react-native";
-import { Button, Overlay } from "react-native-elements";
-import { app } from "../styles/app";
+import { Text, TouchableOpacity, View, Image, TextInput } from 'react-native'
+import { Button, Overlay } from 'react-native-elements'
+import { app } from '../styles/app'
 
-import { header } from "../styles/components/header";
-import UserModel from "../models/User";
+import { header } from '../styles/components/header'
+import UserModel from '../models/User'
 
-import AppButton from "./appButton";
-import SubTitle from "./subTitle";
-import { userData } from "../database/databaseContext";
+import AppButton from './appButton'
+import SubTitle from './subTitle'
+import { userData } from '../database/databaseContext'
 
 const Header = ({ title, subTitle, props }: any) => {
-  const [email, setEmail] = useState("");
-  const [overlayVisible, setOverlayVisible] = useState(false);
-  const [newUserData, setNewUserDataNew] = useState<UserModel>(userData);
+  const [email, setEmail] = useState('')
+  const [overlayVisible, setOverlayVisible] = useState(false)
+  const [newUserData, setNewUserDataNew] = useState<UserModel>(userData)
 
   const updateUser = () => {
-    console.log("update", userData?.uid);
-    firestore.collection("user").doc(userData?.uid).update({
-      displayName: newUserData.displayName,
-      email: newUserData.email,
-      photoURL: newUserData.photoURL,
-    });
-    toggleOverlay();
-  };
+    console.log('update', userData?.uid)
+    firestore
+      .collection('user')
+      .doc(userData?.uid)
+      .update({
+        displayName: newUserData.displayName,
+        email: newUserData.email,
+        photoURL: newUserData.photoURL
+      })
+    toggleOverlay()
+  }
 
   const toggleOverlay = () => {
-    setOverlayVisible(!overlayVisible);
+    setOverlayVisible(!overlayVisible)
     // setoverlayImage(image);
-  };
+  }
 
   const showNotifications = () => {
-    toggleOverlay();
+    toggleOverlay()
     // console.log(props.user.photoURL);
-  };
+  }
 
-  const changeProfilePicture = () => {};
+  const changeProfilePicture = () => {}
 
   return (
     <View style={header.container}>
       <View>
-        <Text>{subTitle ? subTitle : "Welcome back,"}</Text>
+        <Text>{subTitle ? subTitle : null}</Text>
         <Text style={header.title}>{title}</Text>
       </View>
       <View>
@@ -62,7 +65,7 @@ const Header = ({ title, subTitle, props }: any) => {
               source={{
                 uri: newUserData.photoURL
                   ? newUserData.photoURL
-                  : "https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fstartyoungfinancial.com%2Fwp-content%2Fuploads%2F2015%2F05%2Fdefault-image.png&f=1&nofb=1",
+                  : 'https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fstartyoungfinancial.com%2Fwp-content%2Fuploads%2F2015%2F05%2Fdefault-image.png&f=1&nofb=1'
               }}
             />
           </View>
@@ -72,56 +75,56 @@ const Header = ({ title, subTitle, props }: any) => {
         isVisible={overlayVisible}
         onBackdropPress={toggleOverlay}
         overlayStyle={{
-          width: "70%",
+          width: '70%',
 
           padding: 16,
           borderRadius: 12,
-          overflow: "hidden",
+          overflow: 'hidden'
         }}
       >
         <TouchableOpacity onPress={() => changeProfilePicture()}>
           <Image
             source={{ uri: newUserData.photoURL }}
             style={{
-              alignSelf: "center",
+              alignSelf: 'center',
               borderRadius: 100,
               width: 128,
               height: 128,
               marginVertical: 8,
-              shadowColor: "black",
+              shadowColor: 'black',
               shadowOpacity: 0.06,
               shadowRadius: 25,
-              backgroundColor: "red",
+              backgroundColor: 'red'
             }}
           ></Image>
         </TouchableOpacity>
-        <SubTitle title="Profile settings"></SubTitle>
+        <SubTitle title='Profile settings'></SubTitle>
         <TextInput
           style={app.input}
           onChangeText={(text: string) => {
             setNewUserDataNew((oldUser: UserModel) => {
-              oldUser.displayName = text;
-              return { ...oldUser };
-            });
+              oldUser.displayName = text
+              return { ...oldUser }
+            })
           }}
           value={newUserData.displayName}
-          placeholder="Username.."
+          placeholder='Username..'
         />
         <TextInput
           style={app.input}
           onChangeText={(text: string) => {
             setNewUserDataNew((oldUser: UserModel) => {
-              oldUser.email = text;
-              return { ...oldUser };
-            });
+              oldUser.email = text
+              return { ...oldUser }
+            })
           }}
           value={newUserData.email}
-          placeholder="Email.."
+          placeholder='Email..'
         />
-        <AppButton onPress={() => updateUser()} title="Update" />
+        <AppButton onPress={() => updateUser()} title='Update' />
       </Overlay>
     </View>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

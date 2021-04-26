@@ -1,25 +1,30 @@
-import React from "react";
+import React, { useState } from 'react'
 
-import { Text, View, TouchableOpacity } from "react-native";
-import { switchHeader } from "../styles/components/switchHeader";
+import { Text, View, TouchableOpacity } from 'react-native'
+import { switchHeader } from '../styles/components/switchHeader'
 
-const SwitchHeader = ({ props, selected }: any) => {
-  const { navigation } = props;
+const SwitchHeader = ({ props, navigation, selected, onPress }: any) => {
+
   return (
     <View style={switchHeader.header}>
       <TouchableOpacity
         style={switchHeader.itemContainer}
-        onPress={() => navigation.navigate("AddArticle")}
+        onPress={() => navigation.navigate('AddArticle')}
       >
-        <Text style={switchHeader.itemText}>Add to existing</Text>
+        <Text style={switchHeader.itemText}>Add to trip</Text>
         {selected ? <View style={switchHeader.selected}></View> : null}
       </TouchableOpacity>
       <TouchableOpacity style={switchHeader.itemContainer}>
-        <Text style={switchHeader.itemText}>Create new story</Text>
+        <Text
+          style={switchHeader.itemText}
+          onPress={() => navigation.navigate('AddStory')}
+        >
+          Create new trip
+        </Text>
         {!selected ? <View style={switchHeader.selected}></View> : null}
       </TouchableOpacity>
     </View>
-  );
-};
+  )
+}
 
-export default SwitchHeader;
+export default SwitchHeader
