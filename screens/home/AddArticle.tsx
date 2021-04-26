@@ -55,6 +55,7 @@ const AddArticle = ({ route, navigation }: any) => {
   const [articleStory, setArticleStory] = useState('')
   const [articleData, setArticleData] = useState<ArticleModel>({
     storyId: storyId,
+    entryDate: new Date().toLocaleString(),
     title: '',
     note: '',
     images: []
@@ -131,6 +132,7 @@ const AddArticle = ({ route, navigation }: any) => {
       .collection('article')
       .add({
         storyId: articleData?.storyId,
+        entryDate: articleData?.entryDate,
         title: articleData?.title,
         note: articleData?.note,
         images: [

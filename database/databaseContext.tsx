@@ -49,7 +49,7 @@ export const updateUserData = (data: UserModel) => {
     })
 }
 
-export let userStories: Array<StoryModel> = [
+export let userStories: StoryModel[] = [
   {
     author: '',
     description: '',
@@ -60,7 +60,7 @@ export let userStories: Array<StoryModel> = [
   }
 ]
 export const getStories = (fromUser: boolean = true) => {
-  let stories: Array<StoryModel> = [
+  let stories: StoryModel[] = [
     {
       author: '',
       description: '',

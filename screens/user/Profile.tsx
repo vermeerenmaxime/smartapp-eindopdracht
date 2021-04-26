@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
+  RefreshControl
 } from 'react-native'
-import ParallaxScrollView from 'react-native-parallax-scroll-view'
+
 import AppButton from '../../components/appButton'
 import Header from '../../components/header'
 import StoryBig from '../../components/storyBig'
@@ -24,10 +25,23 @@ import { firebase, firestore } from '../../database/firebase'
 import StoryModel from '../../models/Story'
 
 import { app } from '../../styles/app'
-// Inside of a component's render() method:
+
+const wait = (timeout: number) => {
+  return new Promise(resolve => setTimeout(resolve, timeout))
+}
 
 const Profile = ({ route, navigation }: any) => {
-  const [stories, setStories] = useState()
+  // const [userStories, setUserStories] = useState([
+  //   {
+  //     author: '',
+  //     description: '',
+  //     image: '',
+  //     likes: '',
+  //     private: true,
+  //     title: ''
+  //   }
+  // ])
+
   const [storiesPublished, setStoriesPublished] = useState()
   const [loading, setLoading] = useState(true)
   const signOut = () => {
@@ -40,50 +54,6 @@ const Profile = ({ route, navigation }: any) => {
       })
       .catch((error: any) => alert(error))
   }
-  // const createData = async () => {
-  //   const story = firebase.firestore().collection("story");
-  //   story.doc("TR").set({
-  //     userId: "2JvTQVISdihsVOFE9fXcGb4erer2",
-  //     title: "Norway Trip 1",
-  //     image:
-  //       "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.imagesource.com%2Fwp-content%2Fuploads%2F2019%2F06%2FRio.jpg&f=1&nofb=1",
-  //   });
-  //   story.doc("TR").set({
-  //     userId: "2JvTQVISdihsVOFE9fXcGb4erer2",
-  //     title: "Norway Trip 2",
-  //     image:
-  //       "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.imagesource.com%2Fwp-content%2Fuploads%2F2019%2F06%2FRio.jpg&f=1&nofb=1",
-  //   });
-  // };
-
-  // const getUserStories = () => {
-  //   var storiesRef = firestore.collection("story");
-
-  //   storiesRef
-  //     .where("author", "==", route.params.user.uid)
-  //     .get()
-  //     .then((query) => {
-  //       let stories: any[] = [];
-
-  //       query.forEach((doc) => {
-  //         let newStory = {
-  //           id: doc.id,
-  //           title: doc.data().title,
-  //           image: doc.data().image,
-  //           private: doc.data().private,
-  //         };
-
-  //         stories.push(newStory);
-
-  //         // ! Dit zorgt ervoor dat ik maar 1 item te zien krijg ipv mijn hele lijst, vandaar de stories.push
-  //         // setUserStories([...userStories, newStory]);
-  //       });
-  //       setUserStories(stories);
-  //     })
-  //     .catch((error: any) => {
-  //       console.log("Error getting documents: ", error);
-  //     });
-  // };
 
   const Stories = (published: boolean = true) => {
     let userStoriesData = getStories()
@@ -116,29 +86,39 @@ const Profile = ({ route, navigation }: any) => {
 
     return html
   }
-  // useEffect(() => {
-  //   createData();
-  //   fetchStories()s;
-  // }, []);
+
+  const [refreshing, setRefreshing] = React.useState(false)
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true)
+    wait(2000).then(() => setRefreshing(false))
+  }, [])
+
   // useFocusEffect(
   //   useCallback(() => {
   //     getStories()
   //     setLoading(false)
   //     console.log(getStories())
-  //   }, [userStories])
+  //   }, [])
   // )
 
   useEffect(() => {
     getStories()
+    // setUserStories(getStories())
     setLoading(false)
-  }, [])
+  })
 
   if (loading) {
     return <ActivityIndicator></ActivityIndicator>
   } else {
     return (
       <SafeAreaView>
-        <ScrollView style={app.container}>
+        <ScrollView
+          style={app.container}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           <Header
             title='Profile'
             subTitle={userData?.displayName}
@@ -149,7 +129,7 @@ const Profile = ({ route, navigation }: any) => {
             add
             onPress={() => navigation.navigate('AddStory')}
           />
-
+          {console.log(userStories)}
           {userStories ? (
             userStories.map((data, index) => {
               if (data.private && data.image && data.title) {
@@ -169,7 +149,7 @@ const Profile = ({ route, navigation }: any) => {
               }
             })
           ) : (
-            <Text>You don't have any published stories yet.</Text>
+            <Text>You don't have any published trips yet.</Text>
           )}
           <SubTitle title='Published trips' />
 

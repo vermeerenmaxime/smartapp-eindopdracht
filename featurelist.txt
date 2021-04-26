@@ -23,13 +23,17 @@ https://github.com/didinj/react-native-firebase-authentication-email-password/tr
 - Public stories op map plaatsen
 - Public story to story
 
+- Story add ✅ 🟠 ! REDO naar storyData[]
 - Story editten ✅
+- Story delete ✅
 - - Story foto edit
 - Story liken
 
-- Article toevoegen ✅
+- Article add ✅
 - Article editten ✅
+- Article delete ✅
 - - Article foto toevoegen/verwijderen 
+- - Article sorteren by date
 
 - App/User settings
 - - Upload profile pricture
@@ -39,6 +43,9 @@ https://github.com/didinj/react-native-firebase-authentication-email-password/tr
 - FY, curated & top likes van deze dag
 
 - Header profile picture
+
+Sorteren =>
+https://www.cloudhadoop.com/2018/09/typescript-array-sort-method-with.html
 
 !! Error !!
 - Swipe back to old page => Foute pagina

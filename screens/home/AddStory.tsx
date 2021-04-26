@@ -43,6 +43,7 @@ const AddStory = ({ route, navigation }: any) => {
   const [storyAuthor, setStoryAuthor] = useState(userData?.uid)
 
   const [storyData, setStoryData] = useState<StoryModel>({
+    entryDate: new Date().toLocaleString(),
     author: '',
     description: '',
     image: '',
@@ -137,6 +138,7 @@ const AddStory = ({ route, navigation }: any) => {
       const newStoryRef = firestore.collection('story')
       await newStoryRef
         .add({
+          entryDate: storyData?.entryDate,
           description: storyDescription,
           title: storyTitle,
           image: storyImageUrl,
@@ -162,7 +164,6 @@ const AddStory = ({ route, navigation }: any) => {
         <Header title='Create' props={route.params} />
 
         <SwitchHeader navigation={navigation}></SwitchHeader>
-
       </View>
       <KeyboardAvoidingView
         behavior='padding'

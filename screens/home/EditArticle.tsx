@@ -61,30 +61,8 @@ const EditArticle = ({ route, navigation }: any) => {
     toggleOverlay()
   }
 
-  const [articleImages, setArticleImages] = useState('')
+  const [articleImages, setArticleImages] = useState(article.images)
   const [loading, setLoading] = useState(true)
-
-  const getArticle = (articleId: string) => {
-    setLoading(true)
-    let articleRef = firestore.collection('article')
-
-    articleRef
-      .doc(articleId)
-      .get()
-      .then(doc => {
-        let getArticleData: any = doc.data()
-
-        setArticleData(getArticleData)
-
-        console.log('Article', articleData)
-
-        setLoading(false)
-      })
-      .catch((error: any) => {
-        console.log('Error getting documents: ', error)
-      })
-    setLoading(false)
-  }
 
   const updateArticle = () => {
     setLoading(true)
@@ -106,12 +84,51 @@ const EditArticle = ({ route, navigation }: any) => {
         console.error('Error updating document: ', error)
       })
   }
-  const deleteArticle = () => {}
+
+  const deleteArticleImages = () => {
+    for (let articleImage in articleImages) {
+      let pictureRef = firebase.storage().refFromURL(`${articleImage}`)
+
+      pictureRef
+        .delete()
+        .then(() => {
+          console.log('-- Article picture removed from firebase storage')
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    }
+  }
+  const deleteArticle = () => {
+    setLoading(true)
+    // deleteArticleImages()
+
+    firestore
+      .collection('article')
+      .doc(articleId)
+      .delete()
+      .then(() => {
+        console.log('-- Story removed from firestore database')
+        navigation.navigate('Story', { storyId: story.id })
+      })
+      .catch(error => {
+        console.error('Error removing document: ', error)
+      })
+    setLoading(false)
+  }
+
+  const deleteImage = (image: string) => {
+    console.log('Delete image:', image)
+
+    setArticleImages(articleImages.filter((item: string) => item !== image))
+  }
 
   useFocusEffect(
     useCallback(() => {
       // getArticle(articleId)
       setArticleData(article)
+      // setArticleImages(articleData.images)
+      console.log(articleImages)
       console.log('ArticleId', articleId)
       setLoading(false)
     }, [])
@@ -122,8 +139,8 @@ const EditArticle = ({ route, navigation }: any) => {
   } else {
     return (
       <SafeAreaView>
-        <ScrollView>
-          <View style={[app.container, { marginTop: 32 }]}>
+        <ScrollView style={[app.container, { marginTop: 32 }]}>
+          <View>
             <Text style={[header.title, { fontSize: 32 }]}>{story.title}</Text>
             <SubTitle title='Edit article' />
             <View style={app.input}>
@@ -156,15 +173,14 @@ const EditArticle = ({ route, navigation }: any) => {
 
             <ScrollView
               horizontal={true}
-              style={[story.articleImages, app.scrollViewHorizontal]}
+              style={[
+                story.articleImages,
+                app.scrollViewHorizontal,
+                { paddingVertical: 16 }
+              ]}
             >
-              {/* {articleData?.images
-                ? articleData?.images.map(image => {
-                  <TouchableOpacity style={[story.articleImage]}></TouchableOpacity>
-                  })
-                : null} */}
-              {articleData?.images
-                ? articleData?.images.map((image, index) => {
+              {articleImages
+                ? articleImages.map((image: string, index: Number) => {
                     return (
                       <ArticleImage
                         key={index}

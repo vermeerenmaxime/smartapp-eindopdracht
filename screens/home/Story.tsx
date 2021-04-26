@@ -35,6 +35,7 @@ import { useFocusEffect } from '@react-navigation/native'
 
 import StoryModel from '../../models/Story'
 import ArticleModel from '../../models/Article'
+import ArticleImage from '../../components/articleImage'
 import UserModel from '../../models/User'
 import AppButton from '../../components/appButton'
 import { Overlay } from 'react-native-elements'
@@ -64,6 +65,18 @@ const Story = ({ route, navigation, user }: any) => {
 
   const toggleStoryEditOverlay = () => {
     setOverlayStoryEditVisible(!overlayStoryEditVisible)
+  }
+
+  const [visible, setVisible] = useState(false)
+  const [overlayImage, setOverlayImage] = useState('')
+
+  const toggleOverlay = () => {
+    setVisible(!visible)
+  }
+
+  const clickImage = (image: any) => {
+    setOverlayImage(image)
+    toggleOverlay()
   }
 
   const getStory = (storyId: string) => {
@@ -96,13 +109,16 @@ const Story = ({ route, navigation, user }: any) => {
         query.forEach(doc => {
           let newArticle = {
             id: doc.id,
+            entryDate: doc.data().entryDate,
             title: doc.data().title,
-            // image: doc.data().image,
+            images: doc.data().images,
             note: doc.data().note
           }
 
           articles.push(newArticle)
         })
+        articles.sort(compareDate)
+        console.log(articles)
         setStoryArticles(articles)
       })
       .catch((error: any) => {
@@ -130,6 +146,26 @@ const Story = ({ route, navigation, user }: any) => {
         getStories()
         toggleStoryEditOverlay()
         console.log('-- Story updated firestore database')
+      })
+      .catch(error => {
+        console.error('Error updating document: ', error)
+      })
+
+    setLoading(false)
+  }
+
+  const likeStory = () => {
+    setLoading(true)
+
+    firestore
+      .collection('story')
+      .doc(storyId)
+      .update({
+        likes: storyData?.likes + 1
+      })
+      .then(() => {
+        getStories()
+        console.log('-- Story liked')
       })
       .catch(error => {
         console.error('Error updating document: ', error)
@@ -198,6 +234,11 @@ const Story = ({ route, navigation, user }: any) => {
     }
   }
 
+  var compareDate = function (emp1: ArticleModel, emp2: ArticleModel) {
+    var emp1Date = new Date(emp1.entryDate).getTime()
+    var emp2Date = new Date(emp2.entryDate).getTime()
+    return emp1Date > emp2Date ? 1 : -1
+  }
   useFocusEffect(
     useCallback(() => {
       getStory(storyId)
@@ -269,10 +310,7 @@ const Story = ({ route, navigation, user }: any) => {
                 />
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity
-                style={story.like}
-                onPress={() => console.log('Like')}
-              >
+              <TouchableOpacity style={story.like} onPress={() => likeStory()}>
                 <FontAwesomeIcon
                   icon={faHeart}
                   size={32}
@@ -335,9 +373,19 @@ const Story = ({ route, navigation, user }: any) => {
                     horizontal={true}
                     style={[story.articleImages, app.scrollViewHorizontal]}
                   >
-                    <TouchableOpacity
-                      style={[story.articleImage]}
-                    ></TouchableOpacity>
+                    {article.images
+                      ? article.images.map((image, index) => {
+                          return (
+                            <ArticleImage
+                              key={index}
+                              uri={image}
+                              onPress={() => {
+                                clickImage(image)
+                              }}
+                            ></ArticleImage>
+                          )
+                        })
+                      : null}
                   </ScrollView>
                 </View>
               )
@@ -444,6 +492,26 @@ const Story = ({ route, navigation, user }: any) => {
             </View>
           </Overlay>
         ) : null}
+        <Overlay
+          isVisible={visible}
+          onBackdropPress={toggleOverlay}
+          overlayStyle={{
+            width: '90%',
+
+            padding: 0,
+            borderRadius: 12,
+            overflow: 'hidden'
+          }}
+        >
+          <Image
+            source={{ uri: overlayImage }}
+            style={{
+              width: '100%',
+              height: 500
+            }}
+            resizeMode='cover'
+          ></Image>
+        </Overlay>
       </ScrollView>
     )
   }
