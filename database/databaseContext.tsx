@@ -31,7 +31,7 @@ export const setUserData = (data: UserModel) => {
   return userData
 }
 export const getUserData = () => {
-  const userDataFromFirestore: UserModel = firestore
+  const userDataFromFirestore:UserModel = firestore
     .collection('user')
     .doc(userData.uid)
     .get()
@@ -59,6 +59,8 @@ export let userStories: StoryModel[] = [
     title: ''
   }
 ]
+
+const storiesRef = firestore.collection('story')
 export const getStories = (fromUser: boolean = true) => {
   let stories: StoryModel[] = [
     {
@@ -70,7 +72,6 @@ export const getStories = (fromUser: boolean = true) => {
       title: ''
     }
   ]
-  const storiesRef = firestore.collection('story')
 
   if (fromUser) {
     userStories = []
@@ -131,6 +132,43 @@ export const getStory = (storyId: string) => {
     private: true,
     title: ''
   }
+  return story
+}
+// s
+
+export const getStoryFromUserLatest = () => {
+  let story: StoryModel = {
+    author: '',
+    description: '',
+    image: '',
+    likes: '',
+    private: true,
+    title: ''
+  }
+
+  storiesRef
+    .where('author', '==', userData.uid)
+    .where('entryTime', '==', userData.uid)
+    .get()
+    .then(query => {
+      query.forEach(doc => {
+        let newStory: StoryModel = {
+          id: doc.id,
+          title: doc.data().title,
+          image: doc.data().image,
+          private: doc.data().private,
+          author: doc.data().author,
+          description: doc.data().description,
+          likes: doc.data().likes,
+          lat: doc.data().lat,
+          long: doc.data().long
+        }
+        userStories.push(newStory)
+      })
+    })
+    .catch((error: any) => {
+      console.log('Error getting latest userStory: ', error)
+    })
   return story
 }
 export const addStory = (newStory: StoryModel) => {

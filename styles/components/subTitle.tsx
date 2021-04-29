@@ -3,7 +3,7 @@ import { color } from "../colors";
 
 export const subtitle = StyleSheet.create({
   container: {
-    paddingVertical: 12,
+    paddingVertical: 16,
     alignItems: "center",
     flexDirection: "row",
   },

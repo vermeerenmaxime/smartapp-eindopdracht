@@ -11,7 +11,8 @@ import {
   Image,
   KeyboardAvoidingView,
   SkewXTransform,
-  Platform
+  Platform,
+  Picker
 } from 'react-native'
 
 import { Select, Option } from 'react-native-select-lists'
@@ -41,10 +42,12 @@ import { firestore } from '../../database/firebase'
 import ArticleModel from '../../models/Article'
 import {
   getStories,
+  getStoryFromUserLatest,
   userData,
   userStories
 } from '../../database/databaseContext'
 import { useFocusEffect } from '@react-navigation/native'
+import StoryModel from '../../models/Story'
 
 const AddArticle = ({ route, navigation }: any) => {
   const [visible, setVisible] = useState(false)
@@ -55,7 +58,7 @@ const AddArticle = ({ route, navigation }: any) => {
   const [articleStory, setArticleStory] = useState('')
   const [articleData, setArticleData] = useState<ArticleModel>({
     storyId: storyId,
-    entryDate: new Date().toLocaleString(),
+    entryDate: new Date(),
     title: '',
     note: '',
     images: []
@@ -94,6 +97,12 @@ const AddArticle = ({ route, navigation }: any) => {
     if (storyId) {
       setArticleData((oldArticle: ArticleModel) => {
         oldArticle.storyId = storyId
+        return { ...oldArticle }
+      })
+    } else {
+      setArticleData((oldArticle: ArticleModel) => {
+        let story: StoryModel = getStoryFromUserLatest()
+        oldArticle.storyId = story.id
         return { ...oldArticle }
       })
     }
@@ -148,6 +157,7 @@ const AddArticle = ({ route, navigation }: any) => {
         console.error('Error adding article: ', error)
       })
   }
+  const [selectedValue, setSelectedValue] = useState('java')
   return (
     <SafeAreaView>
       <View style={app.container}>
@@ -160,8 +170,30 @@ const AddArticle = ({ route, navigation }: any) => {
         keyboardVerticalOffset={0}
       >
         <ScrollView style={app.container}>
-          <SubTitle title='Select trip' />
-          <Select
+          <SubTitle title='Trip' />
+          <TextInput
+            placeholder='Trip..'
+            style={app.input}
+            placeholderTextColor={color.gray}
+            editable={false}
+            value={storyId}
+          ></TextInput>
+
+          {/* <Picker
+            selectedValue={selectedValue}
+            style={{ height: 50, width: 150,margin:16 }}
+            onValueChange={(itemValue, itemIndex) =>
+              setSelectedValue(itemValue)
+            }
+          >
+            <Picker.Item label='Java' value='java' />
+            <Picker.Item label='JavaScript' value='js' />
+            <Picker.Item label='JavaScript' value='js' />
+            <Picker.Item label='JavaScript' value='js' />
+            <Picker.Item label='JavaScript' value='js' />
+            <Picker.Item label='JavaScript' value='js' />
+          </Picker> */}
+          {/* <Select
             selectTextStyle={{
               fontSize: 16,
               paddingHorizontal: 8
@@ -212,7 +244,7 @@ const AddArticle = ({ route, navigation }: any) => {
             ) : (
               <Option value={1}>No stories available</Option>
             )}
-          </Select>
+          </Select> */}
           <SubTitle title='Article' />
           <View style={app.input}>
             <TextInput
@@ -242,7 +274,6 @@ const AddArticle = ({ route, navigation }: any) => {
             ></TextInput>
           </View>
           <SubTitle title='Add pictures' />
-
           <ScrollView
             horizontal={true}
             style={[story.articleImages, app.scrollViewHorizontal]}

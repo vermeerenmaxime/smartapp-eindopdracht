@@ -34,12 +34,10 @@ const Header = ({ title, subTitle, props }: any) => {
 
   const toggleOverlay = () => {
     setOverlayVisible(!overlayVisible)
-    // setoverlayImage(image);
   }
 
   const showNotifications = () => {
     toggleOverlay()
-    // console.log(props.user.photoURL);
   }
 
   const changeProfilePicture = () => {}

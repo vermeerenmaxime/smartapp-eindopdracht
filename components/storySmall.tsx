@@ -1,15 +1,20 @@
-import React from "react";
+import React from 'react'
 
-import { Text, TouchableOpacity } from "react-native";
-import { app } from "../styles/app";
-import { story } from "../styles/components/story";
+import { ImageBackground, Text, TouchableOpacity } from 'react-native'
+import { app } from '../styles/app'
+import { story } from '../styles/components/story'
 
-const showNotifications = () => {};
+const showNotifications = () => {}
 
-const StorySmall = ({ title, onPress }: any) => (
+const StorySmall = ({ title, onPress, image }: any) => (
   <TouchableOpacity style={story.small} onPress={onPress}>
-    <Text style={story.smallText}>{title}</Text>
+    <ImageBackground
+      source={{ uri: image }}
+      style={story.smallImage}
+    >
+      <Text style={story.smallText}>{title}</Text>
+    </ImageBackground>
   </TouchableOpacity>
-);
+)
 
-export default StorySmall;
+export default StorySmall

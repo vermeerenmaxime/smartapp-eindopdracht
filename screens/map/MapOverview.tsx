@@ -7,7 +7,8 @@ import {
   View,
   Dimensions,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  SafeAreaView
 } from 'react-native'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -16,29 +17,43 @@ import * as Permissions from 'expo-permissions'
 import * as Location from 'expo-location'
 import { useFocusEffect } from '@react-navigation/native'
 import { color } from '../../styles/colors'
+import { app } from '../../styles/app'
+import { firestore } from '../../database/firebase'
+import StoryModel from '../../models/Story'
+import { userData } from '../../database/databaseContext'
 
 const mapOverview = ({ route, navigation }: any) => {
+  const [stories, setStories] = useState<StoryModel[]>()
   const [markers, setMarkers] = useState([
     {
       latitude: 50.86421388545356,
       longitude: 3.5698920355299366,
 
       title: 'Foo Place',
-      subtitle: '1234 Foo Drive'
+      subtitle: '1234 Foo Drive',
+      storyId: 'DjbqmxkNqMUWqcMVoWz9',
+
+      color: 'purple'
     },
     {
       latitude: 48.922499,
       longitude: 5.167022,
 
       title: 'belgie',
-      subtitle: 'olalal'
+      subtitle: 'olalal',
+      storyId: 'DjbqmxkNqMUWqcMVoWz9',
+
+      color: 'purple'
     },
     {
       latitude: 37.78825,
       longitude: -122.4324,
 
       title: 'belgie',
-      subtitle: 'olalal'
+      subtitle: 'olalal',
+      storyId: 'DjbqmxkNqMUWqcMVoWz9',
+
+      color: 'purple'
     }
   ])
 
@@ -66,37 +81,66 @@ const mapOverview = ({ route, navigation }: any) => {
       const { latitude, longitude } = location.coords
       // getGeocodeAsync({ latitude, longitude });
 
-      // console.log({ location: { latitude, longitude } });
       setRegion({
         latitude: latitude,
         longitude: longitude,
         latitudeDelta: 0.25,
         longitudeDelta: 0.15
       })
-      // console.log("region", region);
     }
-    setLoading(false)
   }
 
-  const getGeocodeAsync = async (location: any) => {
-    let geocode = await Location.reverseGeocodeAsync(location)
-    // this.setState({ geocode });
-    console.log('geocode:', geocode)
-    // setInitialRegion({ latitude:geocode.latitude, longitude });
+  const storiesRef = firestore.collection('story')
+  const getUserStories = async () => {
+    let stories: StoryModel[] = []
+    await storiesRef
+      .where('author', '==', userData.uid)
+      .get()
+      .then(query => {
+        query.forEach(doc => {
+          let newStory: StoryModel = {
+            id: doc.id,
+            title: doc.data().title,
+            image: doc.data().image,
+            private: doc.data().private,
+            author: doc.data().author,
+            description: doc.data().description,
+            likes: doc.data().likes,
+            lat: doc.data().lat,
+            long: doc.data().long
+          }
+          let marker = {
+            latitude: doc.data().lat,
+            longitude: doc.data().long,
+            title: doc.data().title,
+            subtitle: doc.data().description,
+            storyId: doc.id,
+            color: 'green'
+          }
+          setMarkers([...markers, marker])
+          stories.push(newStory)
+        })
+        setStories(stories)
+      })
+      .catch((error: any) => {
+        console.log('Error getting documents: ', error)
+      })
+    return stories
   }
+
   useFocusEffect(
     useCallback(() => {
       getLocationAsync()
     }, [])
   )
-  // useEffect(() => {
-  //   getLocationAsync();
-  // });
+  useEffect(() => {
+    getUserStories()
+    setLoading(false)
+  }, [])
+
   if (loading) {
     return (
-      <View>
-        <Text>Loading</Text>
-        {console.log('Loading')}
+      <View style={app.activityIndicator}>
         <ActivityIndicator size='large' color={color.gray} />
       </View>
     )
@@ -105,26 +149,27 @@ const mapOverview = ({ route, navigation }: any) => {
       <View style={styles.container}>
         <MapView style={styles.map} initialRegion={region}>
           {markers.map((marker, index) => {
-            // console.log(index);
-            return (
-              <Marker
-                key={index}
-                coordinate={{
-                  latitude: marker.latitude,
-                  longitude: marker.longitude
-                }}
-                pinColor={'purple'} // any color
-                title={marker.title}
-                description={marker.subtitle}
-                onPress={() =>
-                  navigation.navigate('Story', {
-                    storyId: 'DjbqmxkNqMUWqcMVoWz9',
-                    edit: false
-                  })
-                }
-                // press={console.log("hi")}
-              />
-            )
+            if (marker.longitude && marker.latitude) {
+              return (
+                <Marker
+                  key={index}
+                  coordinate={{
+                    latitude: marker.latitude,
+                    longitude: marker.longitude
+                  }}
+                  pinColor={marker.color} // any color
+                  title={marker.title}
+                  description={marker.subtitle}
+                  onPress={() =>
+                    navigation.navigate('Story', {
+                      // storyId: 'DjbqmxkNqMUWqcMVoWz9',
+                      storyId: marker.storyId,
+                      edit: false
+                    })
+                  }
+                />
+              )
+            }
           })}
           {locationPermission ? (
             <Marker

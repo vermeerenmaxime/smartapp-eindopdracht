@@ -47,6 +47,10 @@ https://github.com/didinj/react-native-firebase-authentication-email-password/tr
 Sorteren =>
 https://www.cloudhadoop.com/2018/09/typescript-array-sort-method-with.html
 
+NICE TO HAVE
+- Category
+- - adventure, city, outdoor, urban, beach, ..
+
 !! Error !!
 - Swipe back to old page => Foute pagina
 - Image kan niet gevonden worden op de server => bestaat wel

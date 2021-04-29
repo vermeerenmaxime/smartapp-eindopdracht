@@ -25,25 +25,15 @@ import { firebase, firestore } from '../../database/firebase'
 import StoryModel from '../../models/Story'
 
 import { app } from '../../styles/app'
+import { color } from '../../styles/colors'
 
 const wait = (timeout: number) => {
   return new Promise(resolve => setTimeout(resolve, timeout))
 }
 
 const Profile = ({ route, navigation }: any) => {
-  // const [userStories, setUserStories] = useState([
-  //   {
-  //     author: '',
-  //     description: '',
-  //     image: '',
-  //     likes: '',
-  //     private: true,
-  //     title: ''
-  //   }
-  // ])
-
-  const [storiesPublished, setStoriesPublished] = useState()
   const [loading, setLoading] = useState(true)
+  const [stories, setStories] = useState<StoryModel[]>()
   const signOut = () => {
     firebase
       .auth()
@@ -55,38 +45,6 @@ const Profile = ({ route, navigation }: any) => {
       .catch((error: any) => alert(error))
   }
 
-  const Stories = (published: boolean = true) => {
-    let userStoriesData = getStories()
-
-    const html = []
-
-    if (userStoriesData) {
-      if (published) {
-        userStories.map((data, index) => {
-          if (data.private && data.image && data.title) {
-            html.push(
-              <StoryBig
-                key={index}
-                title={data.title}
-                image={data.image}
-                onPress={() =>
-                  navigation.navigate('Story', {
-                    storyId: data.id,
-                    edit: true
-                  })
-                }
-              />
-            )
-          }
-        })
-      }
-    } else {
-      html.push(<Text>Geen trips gevonden</Text>)
-    }
-
-    return html
-  }
-
   const [refreshing, setRefreshing] = React.useState(false)
 
   const onRefresh = useCallback(() => {
@@ -94,22 +52,48 @@ const Profile = ({ route, navigation }: any) => {
     wait(2000).then(() => setRefreshing(false))
   }, [])
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     getStories()
-  //     setLoading(false)
-  //     console.log(getStories())
-  //   }, [])
-  // )
+  const storiesRef = firestore.collection('story')
+  const getUserStories = async () => {
+    let stories: StoryModel[] = []
+    await storiesRef
+      .where('author', '==', userData.uid)
+      .get()
+      .then(query => {
+        query.forEach(doc => {
+          let newStory: StoryModel = {
+            id: doc.id,
+            title: doc.data().title,
+            image: doc.data().image,
+            private: doc.data().private,
+            author: doc.data().author,
+            description: doc.data().description,
+            likes: doc.data().likes,
+            lat: doc.data().lat,
+            long: doc.data().long
+          }
+          stories.push(newStory)
+        })
+        setStories(stories)
+      })
+      .catch((error: any) => {
+        console.log('Error getting documents: ', error)
+      })
+    return stories
+  }
 
   useEffect(() => {
-    getStories()
-    // setUserStories(getStories())
+    // getStories()
+    getUserStories()
+
     setLoading(false)
-  })
+  }, [])
 
   if (loading) {
-    return <ActivityIndicator></ActivityIndicator>
+    return (
+      <View style={app.activityIndicator}>
+        <ActivityIndicator size='large' color={color.gray} />
+      </View>
+    )
   } else {
     return (
       <SafeAreaView>
@@ -129,9 +113,9 @@ const Profile = ({ route, navigation }: any) => {
             add
             onPress={() => navigation.navigate('AddStory')}
           />
-          {console.log(userStories)}
-          {userStories ? (
-            userStories.map((data, index) => {
+
+          {stories ? (
+            stories.map((data, index) => {
               if (data.private && data.image && data.title) {
                 return (
                   <StoryBig
@@ -153,8 +137,8 @@ const Profile = ({ route, navigation }: any) => {
           )}
           <SubTitle title='Published trips' />
 
-          {userStories ? (
-            userStories.map((data, index) => {
+          {stories ? (
+            stories.map((data, index) => {
               if (!data.private && data.image && data.title) {
                 return (
                   <StoryBig

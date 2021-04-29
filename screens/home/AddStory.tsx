@@ -47,7 +47,7 @@ const AddStory = ({ route, navigation }: any) => {
     author: '',
     description: '',
     image: '',
-    likes: '0',
+    likes: 0,
     private: true,
     title: ''
   })

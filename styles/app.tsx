@@ -4,8 +4,7 @@ import { color } from './colors'
 export const app = StyleSheet.create({
   container: {
     // paddingVertical: 16,
-    paddingHorizontal: 32,
-
+    paddingHorizontal: 32
   },
   containerWelcome: {
     // flex: 1,
@@ -64,5 +63,10 @@ export const app = StyleSheet.create({
     padding: 12
 
     // textDecoration:"underline",
+  },
+  activityIndicator: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%'
   }
 })

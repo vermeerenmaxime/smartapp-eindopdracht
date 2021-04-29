@@ -41,6 +41,7 @@ import AppButton from '../../components/appButton'
 import { Overlay } from 'react-native-elements'
 
 import { getStories, userData } from '../../database/databaseContext'
+import { color } from '../../styles/colors'
 
 const Story = ({ route, navigation, user }: any) => {
   const imageUrl = {
@@ -54,12 +55,17 @@ const Story = ({ route, navigation, user }: any) => {
     author: '',
     description: '',
     image: '',
-    likes: '',
+    likes: 0,
     private: true,
     title: ''
   })
   const [storyArticles, setStoryArticles] = useState<ArticleModel[]>([])
-  // const [storyAuthor, setStoryAuthor] = useState<UserModel>([]);
+  const [storyAuthor, setStoryAuthor] = useState<UserModel>({
+    uid: '',
+    displayName: '',
+    photoURL: '',
+    email: ''
+  })
   const [overlayStoryEditVisible, setOverlayStoryEditVisible] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -79,30 +85,26 @@ const Story = ({ route, navigation, user }: any) => {
     toggleOverlay()
   }
 
-  const getStory = (storyId: string) => {
-    setLoading(true)
+  const getStory = async (storyId: string) => {
     let storiesRef = firestore.collection('story')
 
-    storiesRef
+    await storiesRef
       .doc(storyId)
       .get()
       .then(doc => {
         let getStoryData: any = doc.data()
 
         setStoryData(getStoryData)
-        // console.log('Story', storyData)
-
-        getStoryArticles(storyId)
-        setLoading(false)
       })
       .catch((error: any) => {
         console.log('Error getting documents: ', error)
       })
   }
-  const getStoryArticles = (storyId: string) => {
-    let storiesRef = firestore.collection('article')
-    storiesRef
+  const getStoryArticles = async (storyId: string) => {
+    let articlesRef = firestore.collection('article')
+    articlesRef
       .where('storyId', '==', storyId)
+      .orderBy('entryDate', 'asc')
       .get()
       .then(query => {
         let articles: any = []
@@ -114,11 +116,8 @@ const Story = ({ route, navigation, user }: any) => {
             images: doc.data().images,
             note: doc.data().note
           }
-
           articles.push(newArticle)
         })
-        articles.sort(compareDate)
-        console.log(articles)
         setStoryArticles(articles)
       })
       .catch((error: any) => {
@@ -126,8 +125,26 @@ const Story = ({ route, navigation, user }: any) => {
       })
   }
 
-  const getStoryAuthor = (storyId, author) => {
-    // TODO !
+  const getUserFromUserId = async () => {
+    let authorRef = firestore.collection('user')
+
+    await authorRef
+      .doc(storyData?.author)
+      .get()
+      .then(doc => {
+        let author: UserModel = {
+          uid: doc.id,
+          displayName: doc.data()?.displayName,
+          email: doc.data()?.email,
+          photoURL: doc.data()?.photoURL
+        }
+        setStoryAuthor(author)
+        // let author: any = doc.data()
+        // return author;
+      })
+      .catch((error: any) => {
+        console.log('Error getting documents: ', error)
+      })
   }
 
   const updateStory = () => {
@@ -150,18 +167,21 @@ const Story = ({ route, navigation, user }: any) => {
       .catch(error => {
         console.error('Error updating document: ', error)
       })
-
-    setLoading(false)
   }
 
-  const likeStory = () => {
+  const likeStory = async () => {
     setLoading(true)
 
-    firestore
+    setStoryData((oldStory: StoryModel) => {
+      oldStory.likes = oldStory.likes +1
+      return { ...oldStory }
+    })
+
+    await firestore
       .collection('story')
       .doc(storyId)
       .update({
-        likes: storyData?.likes + 1
+        likes: storyData?.likes
       })
       .then(() => {
         getStories()
@@ -195,6 +215,7 @@ const Story = ({ route, navigation, user }: any) => {
       .delete()
       .then(() => {
         console.log('-- Story removed from firestore database')
+
         navigation.navigate('Profile')
       })
       .catch(error => {
@@ -218,7 +239,6 @@ const Story = ({ route, navigation, user }: any) => {
           <Text>Publish trip</Text>
           <Switch
             ios_backgroundColor='#3e3e3e'
-            // onValueChange={toggleSwitch}
             onValueChange={(published: boolean) => {
               setStoryData((oldStory: StoryModel) => {
                 oldStory.private = published
@@ -234,18 +254,61 @@ const Story = ({ route, navigation, user }: any) => {
     }
   }
 
-  var compareDate = function (emp1: ArticleModel, emp2: ArticleModel) {
-    var emp1Date = new Date(emp1.entryDate).getTime()
-    var emp2Date = new Date(emp2.entryDate).getTime()
-    return emp1Date > emp2Date ? 1 : -1
-  }
-  useFocusEffect(
-    useCallback(() => {
-      getStory(storyId)
-    }, [])
-  )
-  if (loading) return <ActivityIndicator></ActivityIndicator>
-  else {
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     setLoading(true)
+  //     getStory(storyId)
+  //     getStoryArticles(storyId)
+  //     // let author =
+  //     setStoryAuthor(getUserFromUserId('2JvTQVISdihsVOFE9fXcGb4erer2'))
+  //     // console.log('Author', { storyAuthor })
+
+  //     // console.log('Story', { storyData })
+  //     setLoading(false)
+  //   }, [])
+  // )
+
+  useEffect(() => {
+    setLoading(true)
+    getStory(storyId)
+    getStoryArticles(storyId)
+
+    // ! StoryData is leeg, terwijl de pagina wel gevuld wordt met data uit storyData
+    // StoryData wordt gevuld na .then() in getStory is
+    console.log('StoryData loaded', storyData)
+
+    // ! Hierdoor kan ik mijn functie getuserfromuserid niet uitvoeren om de auteur van mijn story op te halen
+    console.log('Storydata loadeds', storyData.author)
+
+    // ! werkt hier niet want storyData is nog leeg
+
+    setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    getUserFromUserId()
+  }, [storyData])
+
+  // useEffect(() => {
+  //   setLoading(true)
+  //   console.log('StoryData loaded', storyData)
+
+  //   // ! Werkt als de functie nog niet uitgevoerd is
+  //   console.log('Storydata loadeds', storyData.author)
+
+  //   // ! Als ik deze functie uit de // zet, dan wordt storydata author leeg en runt de app niet meer
+  //   // getUserFromUserId(storyData.author)
+
+  //   setLoading(false)
+  // }, [storyData])
+
+  if (loading) {
+    return (
+      <View style={app.activityIndicator}>
+        <ActivityIndicator size='large' color={color.gray} />
+      </View>
+    )
+  } else {
     return (
       <ScrollView>
         <ImageBackground
@@ -270,10 +333,10 @@ const Story = ({ route, navigation, user }: any) => {
             >
               <TouchableOpacity style={story.avatar}>
                 <View>
-                  <Image
+                  {/* <Image
                     style={story.avatarImage}
-                    source={require('../../assets/favicon.png')}
-                  />
+                    source={{ uri: storyAuthor?.photoURL }}
+                  /> */}
                 </View>
               </TouchableOpacity>
               <View
@@ -284,7 +347,7 @@ const Story = ({ route, navigation, user }: any) => {
                 }}
               >
                 <Text style={story.author}>
-                  written by <Text>Martijn Loth</Text>
+                  written by <Text>{storyAuthor?.displayName}</Text>
                 </Text>
                 <View style={story.likes}>
                   <FontAwesomeIcon

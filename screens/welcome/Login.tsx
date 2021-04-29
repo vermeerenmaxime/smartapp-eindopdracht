@@ -63,7 +63,7 @@ const Login = ({ route, navigation }: any) => {
   }
   if (loading) {
     return (
-      <View>
+      <View style={app.activityIndicator}>
         <ActivityIndicator size='large' color={color.gray} />
       </View>
     )
