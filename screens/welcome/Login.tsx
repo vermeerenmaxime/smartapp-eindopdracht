@@ -23,7 +23,8 @@ import { firestore, firebase } from '../../database/firebase'
 import {
   userData,
   setUserData,
-  UserDataContext
+  UserDataContext,
+  getUserData
 } from '../../database/databaseContext'
 import { color } from '../../styles/colors'
 

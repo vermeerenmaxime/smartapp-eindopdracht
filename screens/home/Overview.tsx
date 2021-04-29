@@ -63,12 +63,12 @@ const Overview = ({ route, navigation }: any) => {
           padding: 16,
           backgroundColor: 'white',
           borderRadius: 12,
-          marginTop: 16,
-          marginBottom: 8
+          marginTop: 32,
+          marginBottom: 24
         }}
       >
         <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Hello! 👋</Text>
-        <Text style={{ marginTop: 8 }}>Welcome on Travler.</Text>
+        <Text style={{ marginTop: 12 }}>Welcome on Travler.</Text>
         <Text style={{ marginTop: 8 }}>
           Travler is an app where u can write down about your trips. You can
           upload photo's to your articles and share them with other users on the
@@ -86,6 +86,7 @@ const Overview = ({ route, navigation }: any) => {
             // console.log(story)
             return (
               <StorySmall
+              key={index}
                 title={story.title}
                 image={story.image}
                 onPress={() =>

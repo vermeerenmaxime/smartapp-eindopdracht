@@ -1,10 +1,9 @@
 import { firebase, firestore } from '../database/firebase'
 
-// import firebase from "firebase";
 import React, { useState } from 'react'
 
-import { Text, TouchableOpacity, View, Image, TextInput } from 'react-native'
-import { Button, Overlay } from 'react-native-elements'
+import { Text, TouchableOpacity, View, Image, TextInput, Alert } from 'react-native'
+import { Overlay } from 'react-native-elements'
 import { app } from '../styles/app'
 
 import { header } from '../styles/components/header'
@@ -12,12 +11,19 @@ import UserModel from '../models/User'
 
 import AppButton from './appButton'
 import SubTitle from './subTitle'
-import { userData } from '../database/databaseContext'
+import {
+  getUserData,
+  userData,
+  userFromDatabase
+} from '../database/databaseContext'
 
 const Header = ({ title, subTitle, props }: any) => {
-  const [email, setEmail] = useState('')
+  getUserData()
+
   const [overlayVisible, setOverlayVisible] = useState(false)
-  const [newUserData, setNewUserDataNew] = useState<UserModel>(userData)
+  const [newUserData, setNewUserDataNew] = useState<UserModel>(userFromDatabase)
+
+  console.log(newUserData)
 
   const updateUser = () => {
     console.log('update', userData?.uid)
@@ -29,6 +35,10 @@ const Header = ({ title, subTitle, props }: any) => {
         email: newUserData.email,
         photoURL: newUserData.photoURL
       })
+      .then(() => {
+        Alert.alert('Succesfully updated profile')
+      })
+
     toggleOverlay()
   }
 
@@ -60,10 +70,12 @@ const Header = ({ title, subTitle, props }: any) => {
             <Image
               style={header.avatarImage}
               // source={require("../assets/favicon.png")}
+              // source={{ uri: newUserData.photoURL }}
+              
               source={{
                 uri: newUserData.photoURL
                   ? newUserData.photoURL
-                  : 'https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fstartyoungfinancial.com%2Fwp-content%2Fuploads%2F2015%2F05%2Fdefault-image.png&f=1&nofb=1'
+                  : 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ferp.24h.com.vn%2FContent%2Fimage%2Fupload%2Fdefault_avartar.png'
               }}
             />
           </View>

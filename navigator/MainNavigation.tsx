@@ -22,6 +22,7 @@ import { navigationBottom } from '../styles/components/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 
 import {
+  faGlobeEurope,
   faHome,
   faMapMarkedAlt,
   faPlus,
@@ -95,8 +96,8 @@ export default function MainNavigation ({ route, navigation }: any) {
       // tabBar={(props) => <CustomTabBar {...props} />}
       // screenOptions={customTabOptions}
       tabBarOptions={{
-        inactiveTintColor: 'white',
-        activeTintColor: '#59D999',
+        inactiveTintColor: color.light,
+        activeTintColor: color.alpha,
 
         tabStyle: {},
         safeAreaInsets: {
@@ -141,7 +142,7 @@ export default function MainNavigation ({ route, navigation }: any) {
           tabBarIcon: ({ size, focused }) => {
             return (
               <FontAwesomeIcon
-                icon={faHome}
+                icon={faGlobeEurope}
                 style={{ color: color.light }}
                 size={24}
               ></FontAwesomeIcon>
@@ -157,11 +158,19 @@ export default function MainNavigation ({ route, navigation }: any) {
           title: '',
           tabBarIcon: ({ size, focused }) => {
             return (
-              <FontAwesomeIcon
-                icon={faPlus}
-                style={{ color: color.alpha }}
-                size={24}
-              ></FontAwesomeIcon>
+              <View
+                style={{
+                  backgroundColor: color.alpha,
+                  padding: 12,
+                  borderRadius: 12
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faPlus}
+                  style={{ color: color.light }}
+                  size={24}
+                ></FontAwesomeIcon>
+              </View>
             )
           }
         }}

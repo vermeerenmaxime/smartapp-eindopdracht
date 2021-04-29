@@ -30,13 +30,21 @@ export const setUserData = (data: UserModel) => {
   }
   return userData
 }
-export const getUserData = () => {
-  const userDataFromFirestore:UserModel = firestore
+export const getUserData = async () => {
+  // let userDataFromFirestore: UserModel = {}
+
+  await firestore
     .collection('user')
     .doc(userData.uid)
     .get()
-
-  userFromDatabase = userDataFromFirestore
+    .then(doc => {
+      userFromDatabase = {
+        uid: doc.data()?.uid,
+        displayName: doc.data()?.displayName,
+        email: doc.data()?.email,
+        photoURL: doc.data()?.photoURL
+      }
+    })
 
   return userFromDatabase
 }
@@ -54,7 +62,7 @@ export let userStories: StoryModel[] = [
     author: '',
     description: '',
     image: '',
-    likes: '',
+    likes: 0,
     private: true,
     title: ''
   }
@@ -67,7 +75,7 @@ export const getStories = (fromUser: boolean = true) => {
       author: '',
       description: '',
       image: '',
-      likes: '',
+      likes: 0,
       private: true,
       title: ''
     }
@@ -128,7 +136,7 @@ export const getStory = (storyId: string) => {
     author: '',
     description: '',
     image: '',
-    likes: '',
+    likes: 0,
     private: true,
     title: ''
   }
@@ -141,7 +149,7 @@ export const getStoryFromUserLatest = () => {
     author: '',
     description: '',
     image: '',
-    likes: '',
+    likes: 0,
     private: true,
     title: ''
   }

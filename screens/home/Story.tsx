@@ -173,7 +173,7 @@ const Story = ({ route, navigation, user }: any) => {
     setLoading(true)
 
     setStoryData((oldStory: StoryModel) => {
-      oldStory.likes = oldStory.likes +1
+      oldStory.likes = oldStory.likes + 1
       return { ...oldStory }
     })
 
@@ -254,53 +254,17 @@ const Story = ({ route, navigation, user }: any) => {
     }
   }
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     setLoading(true)
-  //     getStory(storyId)
-  //     getStoryArticles(storyId)
-  //     // let author =
-  //     setStoryAuthor(getUserFromUserId('2JvTQVISdihsVOFE9fXcGb4erer2'))
-  //     // console.log('Author', { storyAuthor })
-
-  //     // console.log('Story', { storyData })
-  //     setLoading(false)
-  //   }, [])
-  // )
-
   useEffect(() => {
     setLoading(true)
     getStory(storyId)
     getStoryArticles(storyId)
-
-    // ! StoryData is leeg, terwijl de pagina wel gevuld wordt met data uit storyData
-    // StoryData wordt gevuld na .then() in getStory is
-    console.log('StoryData loaded', storyData)
-
-    // ! Hierdoor kan ik mijn functie getuserfromuserid niet uitvoeren om de auteur van mijn story op te halen
-    console.log('Storydata loadeds', storyData.author)
-
-    // ! werkt hier niet want storyData is nog leeg
-
-    setLoading(false)
   }, [])
 
   useEffect(() => {
     getUserFromUserId()
+    setLoading(false)
   }, [storyData])
 
-  // useEffect(() => {
-  //   setLoading(true)
-  //   console.log('StoryData loaded', storyData)
-
-  //   // ! Werkt als de functie nog niet uitgevoerd is
-  //   console.log('Storydata loadeds', storyData.author)
-
-  //   // ! Als ik deze functie uit de // zet, dan wordt storydata author leeg en runt de app niet meer
-  //   // getUserFromUserId(storyData.author)
-
-  //   setLoading(false)
-  // }, [storyData])
 
   if (loading) {
     return (
@@ -333,10 +297,10 @@ const Story = ({ route, navigation, user }: any) => {
             >
               <TouchableOpacity style={story.avatar}>
                 <View>
-                  {/* <Image
+                  <Image
                     style={story.avatarImage}
                     source={{ uri: storyAuthor?.photoURL }}
-                  /> */}
+                  />
                 </View>
               </TouchableOpacity>
               <View

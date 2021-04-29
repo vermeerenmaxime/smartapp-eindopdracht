@@ -45,7 +45,10 @@ const Register = ({ navigation }: any) => {
             .collection('user')
             .doc(res.user.userId)
             .set({
-              displayName: res.user.displayName
+              uid:res.user.uid,
+              displayName: res.user.displayName,
+              email: res.user.email,
+              photoURL: res.user.photoURL
             })
 
           console.log('User registered successfully!')

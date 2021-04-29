@@ -57,12 +57,16 @@ const mapOverview = ({ route, navigation }: any) => {
     }
   ])
 
-  const [region, setRegion] = useState({
-    latitude: 37.72825,
-    longitude: -122.4324,
-    latitudeDelta: 0.25,
-    longitudeDelta: 0.15
-  })
+  const [region, setRegion] = useState(
+    route.params.region
+      ? route.params.region
+      : {
+          latitude: 37.72825,
+          longitude: -122.4324,
+          latitudeDelta: 0.25,
+          longitudeDelta: 0.15
+        }
+  )
 
   const [loading, setLoading] = useState(true)
   const [locationPermission, setLocationPermission] = useState(false)

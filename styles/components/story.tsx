@@ -39,7 +39,9 @@ export const story = StyleSheet.create({
     padding: 8,
     color: 'white',
     fontFamily: 'RobotoBold',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
   },
   bigText: {
     fontSize: 18,
