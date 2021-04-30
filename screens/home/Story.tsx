@@ -11,7 +11,8 @@ import {
   Image,
   TextInput,
   ActivityIndicator,
-  Switch
+  Switch,
+  RefreshControl
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import SubTitle from '../../components/subTitle'
@@ -42,6 +43,10 @@ import { Overlay } from 'react-native-elements'
 
 import { getStories, userData } from '../../database/databaseContext'
 import { color } from '../../styles/colors'
+
+const wait = (timeout: number) => {
+  return new Promise(resolve => setTimeout(resolve, timeout))
+}
 
 const Story = ({ route, navigation, user }: any) => {
   const imageUrl = {
@@ -93,7 +98,7 @@ const Story = ({ route, navigation, user }: any) => {
       .get()
       .then(doc => {
         let getStoryData: any = doc.data()
-
+        console.log(getStoryData)
         setStoryData(getStoryData)
       })
       .catch((error: any) => {
@@ -147,26 +152,26 @@ const Story = ({ route, navigation, user }: any) => {
       })
   }
 
-  const updateStory = () => {
+  const updateStory = (published: boolean = storyData.private) => {
     setLoading(true)
     // console.log("foem")
+    console.log(storyData)
     firestore
       .collection('story')
       .doc(storyId)
       .update({
-        image: storyData?.image,
-        description: storyData?.description,
-        private: storyData?.private,
-        title: storyData?.title
+        image: storyData.image,
+        description: storyData.description,
+        private: published,
+        title: storyData.title
       })
       .then(() => {
-        getStories()
-        toggleStoryEditOverlay()
         console.log('-- Story updated firestore database')
       })
       .catch(error => {
         console.error('Error updating document: ', error)
       })
+    setLoading(false)
   }
 
   const likeStory = async () => {
@@ -184,7 +189,6 @@ const Story = ({ route, navigation, user }: any) => {
         likes: storyData?.likes
       })
       .then(() => {
-        getStories()
         console.log('-- Story liked')
       })
       .catch(error => {
@@ -225,6 +229,19 @@ const Story = ({ route, navigation, user }: any) => {
   }
   const changeStoryImage = () => {}
 
+  const [storyPrivate, setStoryPrivate] = useState<boolean>()
+  const toggleSwitchPrivate = () => {
+    if (storyPrivate) setStoryPrivate(false)
+    else setStoryPrivate(true)
+    updateStory(!storyPrivate)
+    // console.log('2', storyPrivate)
+
+    // setStoryData((oldStory: StoryModel) => {
+    //   oldStory.private = storyPrivate
+    //   return { ...oldStory }
+    // })
+  }
+
   const Published = () => {
     if (userData.uid === storyData?.author) {
       return (
@@ -236,16 +253,11 @@ const Story = ({ route, navigation, user }: any) => {
             justifyContent: 'space-between'
           }}
         >
-          <Text>Publish trip</Text>
+          <Text>Private trip</Text>
           <Switch
             ios_backgroundColor='#3e3e3e'
-            onValueChange={(published: boolean) => {
-              setStoryData((oldStory: StoryModel) => {
-                oldStory.private = published
-                return { ...oldStory }
-              })
-            }}
-            value={storyData?.private}
+            onValueChange={toggleSwitchPrivate}
+            value={storyPrivate}
           />
         </View>
       )
@@ -253,7 +265,6 @@ const Story = ({ route, navigation, user }: any) => {
       return null
     }
   }
-
   useEffect(() => {
     setLoading(true)
     getStory(storyId)
@@ -263,8 +274,16 @@ const Story = ({ route, navigation, user }: any) => {
   useEffect(() => {
     getUserFromUserId()
     setLoading(false)
+    setStoryPrivate(storyData.private)
   }, [storyData])
 
+  const [refreshing, setRefreshing] = useState(false)
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true)
+    wait(2000).then(() => setRefreshing(false))
+    getStoryArticles(storyId)
+  }, [])
 
   if (loading) {
     return (
@@ -274,7 +293,11 @@ const Story = ({ route, navigation, user }: any) => {
     )
   } else {
     return (
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <ImageBackground
           source={{ uri: storyData?.image }}
           style={[story.image]}
@@ -434,8 +457,7 @@ const Story = ({ route, navigation, user }: any) => {
               }}
             ></AppButton>
           ) : null}
-
-          {/* View on map extra feature */}
+          <Published />
         </View>
         {route.params.edit ? (
           <Overlay
@@ -491,7 +513,7 @@ const Story = ({ route, navigation, user }: any) => {
                 placeholder='Story description..'
                 multiline={true}
               />
-              <Published />
+
               <View
                 style={{
                   flexDirection: 'row',
@@ -511,7 +533,9 @@ const Story = ({ route, navigation, user }: any) => {
                   style={{ width: '20%' }}
                 />
                 <AppButton
-                  onPress={() => updateStory()}
+                  onPress={() => {
+                    updateStory(), toggleStoryEditOverlay()
+                  }}
                   title='Save changes'
                   style={{ width: '75%' }}
                 />

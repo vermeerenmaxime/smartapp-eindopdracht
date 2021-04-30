@@ -23,7 +23,7 @@ const Header = ({ title, subTitle, props }: any) => {
   const [overlayVisible, setOverlayVisible] = useState(false)
   const [newUserData, setNewUserDataNew] = useState<UserModel>(userFromDatabase)
 
-  console.log(newUserData)
+  // console.log(newUserData)
 
   const updateUser = () => {
     console.log('update', userData?.uid)

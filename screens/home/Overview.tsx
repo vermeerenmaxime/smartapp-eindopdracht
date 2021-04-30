@@ -48,7 +48,7 @@ const Overview = ({ route, navigation }: any) => {
       .catch((error: any) => {
         console.log('Error getting documents: ', error)
       })
-    return stories
+
   }
 
   useEffect(() => {

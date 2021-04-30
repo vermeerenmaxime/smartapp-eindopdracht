@@ -10,11 +10,15 @@ import {
   Alert,
   TextInput,
   Platform,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  ActivityIndicator
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import * as ImagePicker from 'expo-image-picker'
+import * as Permissions from 'expo-permissions'
+
+import * as Location from 'expo-location'
 
 import Header from '../../components/header'
 import SubTitle from '../../components/subTitle'
@@ -34,7 +38,7 @@ import StoryModel from '../../models/Story'
 import { userData } from '../../database/databaseContext'
 
 const AddStory = ({ route, navigation }: any) => {
-  const [storyPrivate, setStoryPrivate] = useState(false)
+  const [storyPrivate, setStoryPrivate] = useState(true)
 
   const [storyTitle, setStoryTitle] = useState('')
   const [storyDescription, setStoryDescription] = useState('')
@@ -52,6 +56,36 @@ const AddStory = ({ route, navigation }: any) => {
     title: ''
   })
 
+  const [loading, setLoading] = useState(true)
+  const [locationPermission, setLocationPermission] = useState(false)
+
+  const [uploading, setUploading] = useState(false)
+  const [transferred, setTransferred] = useState(0)
+
+  const [region, setRegion] = useState({
+    latitude: 0,
+    longitude: 0
+  })
+  const getLocationAsync = async () => {
+    setLoading(true)
+    let { status } = await Permissions.askAsync(Permissions.LOCATION)
+    if (status !== 'granted') {
+      Alert.alert('Cannot load location, permission is denied')
+      setLocationPermission(false)
+    } else {
+      setLocationPermission(true)
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest
+      })
+
+      setRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude
+      })
+    }
+    setLoading(false)
+  }
+
   useEffect(() => {
     ;(async () => {
       if (Platform.OS !== 'web') {
@@ -66,6 +100,7 @@ const AddStory = ({ route, navigation }: any) => {
     setStoryTitle('')
     setStoryDescription('')
     setStoryImage('')
+    getLocationAsync()
   }, [])
 
   const pickImage = async () => {
@@ -87,16 +122,43 @@ const AddStory = ({ route, navigation }: any) => {
     else setStoryPrivate(true)
   }
 
-  const uploadImage = async (uri: any, imageName: string) => {
-    const response = await fetch(uri)
+  const uploadImage = async (imageName: string) => {
+    const response = await fetch(storyImage)
     const blob = await response.blob()
 
-    let ref = firebase
-      .storage()
-      .ref()
-      .child('images/' + imageName)
+    setUploading(true)
+    setTransferred(0)
 
-    return await ref.put(blob)
+    const storageRef = firebase.storage().ref('images/' + imageName)
+    const task = storageRef.put(blob)
+    // let ref = firebase
+    //   .storage()
+    //   .ref()
+    //   .child('images/' + imageName)
+
+    // const task = ref.put(blob)
+
+    task.on('state_changed', taskSnapshot => {
+      console.log(
+        `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`
+      )
+
+      setTransferred(
+        Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
+          100
+      )
+    })
+    try {
+      await task
+
+      const url = await storageRef.getDownloadURL()
+
+      setUploading(false)
+      console.log('-- Image uploaded --')
+      return url
+    } catch (e) {
+      return null
+    }
   }
 
   const getImageFromUpload = async (imageName: any) => {
@@ -120,36 +182,33 @@ const AddStory = ({ route, navigation }: any) => {
 
   const createStory = async () => {
     if (storyTitle && storyDescription && storyImage) {
-      let imageName = `story-${route.params.user.uid}-${new Date().getTime()}`
+      let imageName = `story-${userData?.uid}-${new Date().getTime()}`
       console.log('StoryImage      =>', storyImage)
       console.log('ImageName       =>', imageName)
 
-      await uploadImage(storyImage, imageName)
-        .then(async () => {
-          console.log('-- Image uploaded --')
-        })
-        .catch(error => {
-          Alert.alert(error)
-        })
+      const imageUrl = await uploadImage(imageName)
 
-      getImageFromUpload(imageName)
-      console.log('StoryimageUrl    =>', storyImageUrl)
+      // getImageFromUpload(imageName)
+      // console.log('StoryimageUrl    =>', storyImageUrl)
+      // console.log(imageUrl)
 
-      const newStoryRef = firestore.collection('story')
-      await newStoryRef
+      await firestore
+        .collection('story')
         .add({
           entryDate: storyData?.entryDate,
           description: storyDescription,
           title: storyTitle,
-          image: storyImageUrl,
+          image: imageUrl,
           imageName: imageName,
           author: storyAuthor,
-          likes: '0',
-          private: storyPrivate
+          likes: 0,
+          private: storyPrivate,
+          lat: region.latitude,
+          long: region.longitude
         })
         .then(doc => {
-          console.log('Story succesfully created!')
-          navigation.navigate('Story', { storyId: doc.id })
+          console.log('Story succesfully created!', doc)
+          navigation.navigate('Story', { storyId: doc.id, edit: true })
         })
         .catch(error => {
           console.error('Error writing document: ', error)
@@ -158,78 +217,100 @@ const AddStory = ({ route, navigation }: any) => {
       Alert.alert('Please fill in all fields')
     }
   }
-  return (
-    <SafeAreaView>
-      <View style={app.container}>
-        <Header title='Create' props={route.params} />
-
-        <SwitchHeader navigation={navigation}></SwitchHeader>
+  if (loading) {
+    return (
+      <View style={app.activityIndicator}>
+        <ActivityIndicator size='large' color={color.gray} />
       </View>
-      <KeyboardAvoidingView
-        behavior='padding'
-        enabled
-        keyboardVerticalOffset={0}
-      >
-        <ScrollView style={app.container}>
-          <SubTitle title='Name trip' />
-          <TextInput
-            style={app.input}
-            onChangeText={setStoryTitle}
-            value={storyTitle}
-            placeholder='Tripname..'
-          />
-          <SubTitle title='Description' />
-          <TextInput
-            style={[app.input, { minHeight: 100, paddingTop: 16 }]}
-            onChangeText={setStoryDescription}
-            value={storyDescription}
-            placeholder='Description..'
-            multiline={true}
-          />
-          <SubTitle title='Add story image' />
+    )
+  } else {
+    return (
+      <SafeAreaView>
+        <View style={app.container}>
+          <Header title='Create' props={route.params} />
 
-          {storyImage ? (
-            <ArticleImage onPress={pickImage} uri={storyImage}></ArticleImage>
-          ) : (
-            <TouchableOpacity
-              style={[story.articleImage, { backgroundColor: 'white' }]}
-              onPress={pickImage}
-            >
-              <FontAwesomeIcon
-                icon={faPlus}
-                size={24}
-                color={color.lightGray}
-              />
-            </TouchableOpacity>
-          )}
-
-          <View
-            style={{
-              marginTop: 16,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}
-          >
-            <Text>Publish trip</Text>
-            <Switch
-              ios_backgroundColor='#3e3e3e'
-              onValueChange={toggleSwitch}
-              value={storyPrivate}
+          <SwitchHeader navigation={navigation}></SwitchHeader>
+        </View>
+        <KeyboardAvoidingView
+          behavior='padding'
+          enabled
+          keyboardVerticalOffset={0}
+        >
+          <ScrollView style={app.container}>
+            <SubTitle title='Name trip' />
+            <TextInput
+              style={app.input}
+              onChangeText={setStoryTitle}
+              value={storyTitle}
+              placeholder='Tripname..'
             />
-          </View>
-          <AppButton
-            style={{
-              marginTop: 16,
-              marginBottom: 200
-            }}
-            onPress={() => createStory()}
-            title='Create'
-          />
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  )
+            <SubTitle title='Description' />
+            <TextInput
+              style={[app.input, { minHeight: 100, paddingTop: 16 }]}
+              onChangeText={setStoryDescription}
+              value={storyDescription}
+              placeholder='Description..'
+              multiline={true}
+            />
+            <SubTitle title='Add story image' />
+
+            {storyImage ? (
+              <ArticleImage onPress={pickImage} uri={storyImage}></ArticleImage>
+            ) : (
+              <TouchableOpacity
+                style={[story.articleImage, { backgroundColor: 'white' }]}
+                onPress={pickImage}
+              >
+                <FontAwesomeIcon
+                  icon={faPlus}
+                  size={24}
+                  color={color.lightGray}
+                />
+              </TouchableOpacity>
+            )}
+
+            <View
+              style={{
+                marginTop: 16,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <Text>Private trip</Text>
+              <Switch
+                ios_backgroundColor='#3e3e3e'
+                onValueChange={toggleSwitch}
+                value={storyPrivate}
+              />
+            </View>
+            {uploading ? (
+              <View style={{ marginTop: 16 }}>
+                {transferred == 100 ? (
+                  <SubTitle title='Image succesfully uploaded!'></SubTitle>
+                ) : (
+                  <View>
+                    <SubTitle title='Uploading image'></SubTitle>
+                    <Text>{transferred}% completed!</Text>
+                    <ActivityIndicator size='large' color={color.gray} />
+                  </View>
+                )}
+              </View>
+            ) : (
+              <AppButton
+                style={{
+                  marginTop: 16,
+                  marginBottom: 200
+                }}
+                onPress={() => createStory()}
+                title='Create'
+              />
+            )}
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    )
+  }
 }
 
 export default AddStory

@@ -45,11 +45,12 @@ const Profile = ({ route, navigation }: any) => {
       .catch((error: any) => alert(error))
   }
 
-  const [refreshing, setRefreshing] = React.useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   const onRefresh = useCallback(() => {
     setRefreshing(true)
     wait(2000).then(() => setRefreshing(false))
+    getUserStories()
   }, [])
 
   const storiesRef = firestore.collection('story')
@@ -114,7 +115,7 @@ const Profile = ({ route, navigation }: any) => {
             onPress={() => navigation.navigate('AddStory')}
           />
 
-          {stories ? (
+          {stories &&
             stories.map((data, index) => {
               if (data.private && data.image && data.title) {
                 return (
@@ -131,15 +132,12 @@ const Profile = ({ route, navigation }: any) => {
                   />
                 )
               }
-            })
-          ) : (
-            <Text>You don't have any published trips yet.</Text>
-          )}
+            })}
           <SubTitle title='Published trips' />
 
-          {stories ? (
+          {stories &&
             stories.map((data, index) => {
-              if (!data.private && data.image && data.title) {
+              if (!data.private) {
                 return (
                   <StoryBig
                     key={index}
@@ -154,10 +152,7 @@ const Profile = ({ route, navigation }: any) => {
                   />
                 )
               }
-            })
-          ) : (
-            <Text>You don't have any published stories yet.</Text>
-          )}
+            })}
 
           <AppButton onPress={() => signOut()} title='Logout' />
         </ScrollView>

@@ -23,17 +23,19 @@ https://github.com/didinj/react-native-firebase-authentication-email-password/tr
 - Public stories op map plaatsen
 - Public story to story
 
+- Forgot password
+
 - Story add ✅ 🟠 ! REDO naar storyData[]
 - Story editten ✅
 - Story delete ✅
 - - Story foto edit
-- Story liken
+- Story liken ✅ 🟠 ! Kan oneindig
 
 - Article add ✅
 - Article editten ✅
 - Article delete ✅
 - - Article foto toevoegen/verwijderen 
-- - Article sorteren by date
+- - Article sorteren by date ✅
 
 - App/User settings
 - - Upload profile pricture

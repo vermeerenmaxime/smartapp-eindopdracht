@@ -92,7 +92,7 @@ const Login = ({ route, navigation }: any) => {
               placeholder='Password..'
               secureTextEntry={true}
             />
-            <Text style={app.label}>Forgot password</Text>
+            
             <AppButton onPress={() => userLogin()} title='Login' />
             <TouchableOpacity
               onPress={() => {
@@ -101,6 +101,7 @@ const Login = ({ route, navigation }: any) => {
             >
               <Text style={app.signUp}>Sign up</Text>
             </TouchableOpacity>
+            {/* <Text style={[app.label,{marginTop:32}]}>Forgot password</Text> */}
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>

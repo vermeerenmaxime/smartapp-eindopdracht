@@ -39,7 +39,7 @@ export const getUserData = async () => {
     .get()
     .then(doc => {
       userFromDatabase = {
-        uid: doc.data()?.uid,
+        uid: doc.id,
         displayName: doc.data()?.displayName,
         email: doc.data()?.email,
         photoURL: doc.data()?.photoURL

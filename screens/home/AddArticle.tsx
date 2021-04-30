@@ -12,7 +12,8 @@ import {
   KeyboardAvoidingView,
   SkewXTransform,
   Platform,
-  Picker
+  Picker,
+  ActivityIndicator
 } from 'react-native'
 
 import { Select, Option } from 'react-native-select-lists'
@@ -38,7 +39,6 @@ import AppButton from '../../components/appButton'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 
-import { firestore } from '../../database/firebase'
 import ArticleModel from '../../models/Article'
 import {
   getStories,
@@ -46,6 +46,7 @@ import {
   userData,
   userStories
 } from '../../database/databaseContext'
+import { firebase, firestore } from '../../database/firebase'
 import { useFocusEffect } from '@react-navigation/native'
 import StoryModel from '../../models/Story'
 
@@ -108,6 +109,9 @@ const AddArticle = ({ route, navigation }: any) => {
     }
   }, [])
 
+  const [uploading, setUploading] = useState(false)
+  const [transferred, setTransferred] = useState(0)
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -122,42 +126,80 @@ const AddArticle = ({ route, navigation }: any) => {
     }
   }
 
-  const addArticle = () => {
+  const uploadImage = async (image: string, imageName: string) => {
+    const response = await fetch(image)
+    const blob = await response.blob()
+
+    setUploading(true)
+    setTransferred(0)
+
+    const storageRef = firebase.storage().ref('images/' + imageName)
+    const task = storageRef.put(blob)
+
+    task.on('state_changed', taskSnapshot => {
+      console.log(
+        `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`
+      )
+
+      setTransferred(
+        Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
+          100
+      )
+    })
+    try {
+      await task
+
+      const url = await storageRef.getDownloadURL()
+
+      setUploading(false)
+      console.log('-- Image uploaded --')
+      return url
+    } catch (e) {
+      return null
+    }
+  }
+
+  const addArticle = async () => {
     console.log('woop')
-    let imageName = `article-${userData?.uid}-${new Date().getTime()}`
-    // await uploadImage(storyImage, imageName)
-    //   .then(async () => {
-    //     await getImageFromUpload(imageName);
-    //   })
-    //   .catch((error) => {
-    //     Alert.alert(error);
-    //   });
+
     console.log(articleData)
     if (articleData?.title && articleData?.note) {
+      console.log('ArticleData:', articleData)
+      console.log('ArticleImages:', articleImages)
+      let articleImagesUrl: string[] = []
+      if (articleImages.length > 5) {
+        if (articleImages) {
+          articleImages.map(async (image, index) => {
+            let imageName = `article-${
+              userData?.uid
+            }-${new Date().getTime()}-${index}`
+            const imageUploadedUrl = await uploadImage(image, imageName)
+            articleImagesUrl.push(imageUploadedUrl)
+          })
+        }
+        await firestore
+          .collection('article')
+          .add({
+            storyId: articleData?.storyId,
+            entryDate: articleData?.entryDate,
+            title: articleData?.title,
+            note: articleData?.note,
+            images: articleImagesUrl
+          })
+          .then(() => {
+            console.log(articleStory, 'Article succesfully added!')
+            navigation.navigate('Story', { storyId: articleData?.storyId })
+          })
+          .catch(error => {
+            console.error('Error adding article: ', error)
+          })
+      } else {
+        Alert.alert('Please fill in all fields')
+      }
     } else {
-      Alert.alert('Please fill in all fields')
+      Alert.alert('You can only add 5 images to 1 story')
     }
-    firestore
-      .collection('article')
-      .add({
-        storyId: articleData?.storyId,
-        entryDate: articleData?.entryDate,
-        title: articleData?.title,
-        note: articleData?.note,
-        images: [
-          'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.canalnutricion.com%2Fwp-content%2Fuploads%2Ffiles%2Farticle%2Fu%2Fun-fruto-llamado-mortino_nspa9.jpg&f=1&nofb=1',
-          'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.canalnutricion.com%2Fwp-content%2Fuploads%2Ffiles%2Farticle%2Fu%2Fun-fruto-llamado-mortino_nspa9.jpg&f=1&nofb=1'
-        ]
-      })
-      .then(() => {
-        console.log(articleStory, 'Article succesfully added!')
-        navigation.navigate('Story', { storyId: articleData?.storyId })
-      })
-      .catch(error => {
-        console.error('Error adding article: ', error)
-      })
   }
-  const [selectedValue, setSelectedValue] = useState('java')
   return (
     <SafeAreaView>
       <View style={app.container}>
@@ -303,16 +345,30 @@ const AddArticle = ({ route, navigation }: any) => {
                 })
               : null}
           </ScrollView>
-          <AppButton
-            title='Add to trip'
-            style={{
-              width: '50%',
-              alignSelf: 'flex-end',
-              marginTop: 16,
-              marginBottom: 200
-            }}
-            onPress={() => addArticle()}
-          />
+          {uploading ? (
+            <View style={{ marginTop: 16 }}>
+              {transferred == 100 ? (
+                <SubTitle title='Image succesfully uploaded!'></SubTitle>
+              ) : (
+                <View>
+                  <SubTitle title='Uploading image'></SubTitle>
+                  <Text>{transferred}% completed!</Text>
+                  <ActivityIndicator size='large' color={color.gray} />
+                </View>
+              )}
+            </View>
+          ) : (
+            <AppButton
+              title='Add to trip'
+              style={{
+                width: '50%',
+                alignSelf: 'flex-end',
+                marginTop: 16,
+                marginBottom: 200
+              }}
+              onPress={() => addArticle()}
+            />
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
       <Overlay
