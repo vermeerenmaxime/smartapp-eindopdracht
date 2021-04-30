@@ -1,8 +1,15 @@
 import { firebase, firestore } from '../database/firebase'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
-import { Text, TouchableOpacity, View, Image, TextInput, Alert } from 'react-native'
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+  TextInput,
+  Alert
+} from 'react-native'
 import { Overlay } from 'react-native-elements'
 import { app } from '../styles/app'
 
@@ -12,16 +19,19 @@ import UserModel from '../models/User'
 import AppButton from './appButton'
 import SubTitle from './subTitle'
 import {
-  getUserData,
+  // getUserData,
   userData,
   userFromDatabase
 } from '../database/databaseContext'
 
-const Header = ({ title, subTitle, props }: any) => {
-  getUserData()
-
+const Header = ({ title, subTitle, props, navigation }: any) => {
   const [overlayVisible, setOverlayVisible] = useState(false)
-  const [newUserData, setNewUserDataNew] = useState<UserModel>(userFromDatabase)
+  const [newUserData, setNewUserDataNew] = useState<UserModel>({
+    uid: '',
+    displayName: '',
+    email: '',
+    photoURL: ''
+  })
 
   // console.log(newUserData)
 
@@ -31,12 +41,12 @@ const Header = ({ title, subTitle, props }: any) => {
       .collection('user')
       .doc(userData?.uid)
       .update({
-        displayName: newUserData.displayName,
-        email: newUserData.email,
-        photoURL: newUserData.photoURL
+        displayName: newUserData?.displayName,
+        email: newUserData?.email,
+        photoURL: newUserData?.photoURL
       })
       .then(() => {
-        Alert.alert('Succesfully updated profile')
+        Alert.alert('Profile succesfully updated')
       })
 
     toggleOverlay()
@@ -46,21 +56,47 @@ const Header = ({ title, subTitle, props }: any) => {
     setOverlayVisible(!overlayVisible)
   }
 
-  const showNotifications = () => {
-    toggleOverlay()
+  const signOut = () => {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        alert('Succesfully logged out')
+        navigation.navigate('Login')
+      })
+      .catch((error: any) => alert(error))
   }
 
   const changeProfilePicture = () => {}
 
+  const getUserData = async () => {
+    await firestore
+      .collection('user')
+      .doc(userData.uid)
+      .get()
+      .then(doc => {
+        setNewUserDataNew({
+          uid: doc.id,
+          displayName: doc.data()?.displayName,
+          email: doc.data()?.email,
+          photoURL: doc.data()?.photoURL
+        })
+      })
+  }
+
+  useEffect(() => {
+    getUserData()
+  }, [])
+
   return (
     <View style={header.container}>
       <View>
-        <Text>{subTitle ? subTitle : null}</Text>
+        <Text>{subTitle && subTitle}</Text>
         <Text style={header.title}>{title}</Text>
       </View>
       <View>
         <TouchableOpacity
-          onPress={() => showNotifications()}
+          onPress={() => toggleOverlay()}
           style={header.avatar}
         >
           <View style={header.notificationCircle}>
@@ -69,12 +105,9 @@ const Header = ({ title, subTitle, props }: any) => {
           <View>
             <Image
               style={header.avatarImage}
-              // source={require("../assets/favicon.png")}
-              // source={{ uri: newUserData.photoURL }}
-              
               source={{
-                uri: newUserData.photoURL
-                  ? newUserData.photoURL
+                uri: newUserData?.photoURL
+                  ? newUserData?.photoURL
                   : 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ferp.24h.com.vn%2FContent%2Fimage%2Fupload%2Fdefault_avartar.png'
               }}
             />
@@ -94,7 +127,7 @@ const Header = ({ title, subTitle, props }: any) => {
       >
         <TouchableOpacity onPress={() => changeProfilePicture()}>
           <Image
-            source={{ uri: newUserData.photoURL }}
+            source={{ uri: newUserData?.photoURL }}
             style={{
               alignSelf: 'center',
               borderRadius: 100,
@@ -117,7 +150,7 @@ const Header = ({ title, subTitle, props }: any) => {
               return { ...oldUser }
             })
           }}
-          value={newUserData.displayName}
+          value={newUserData?.displayName}
           placeholder='Username..'
         />
         <TextInput
@@ -128,10 +161,11 @@ const Header = ({ title, subTitle, props }: any) => {
               return { ...oldUser }
             })
           }}
-          value={newUserData.email}
+          value={newUserData?.email}
           placeholder='Email..'
         />
         <AppButton onPress={() => updateUser()} title='Update' />
+        <AppButton red onPress={() => signOut()} title='Logout' />
       </Overlay>
     </View>
   )

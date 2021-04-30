@@ -210,7 +210,7 @@ const AddArticle = ({ route, navigation }: any) => {
   return (
     <SafeAreaView>
       <View style={app.container}>
-        <Header title='Add' props={route.params} />
+        <Header title='Add' props={route.params} navigation={navigation}/>
         <SwitchHeader navigation={navigation} selected></SwitchHeader>
       </View>
       <KeyboardAvoidingView

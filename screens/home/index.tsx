@@ -11,7 +11,6 @@ const Stack = createStackNavigator()
 
 const Home = ({ route, navigation }: any) => {
   return (
-    // headerMode="none"
     <Stack.Navigator headerMode='none' initialRouteName='Overview'>
       <Stack.Screen
         name='Overview'

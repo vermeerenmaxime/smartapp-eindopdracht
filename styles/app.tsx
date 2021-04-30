@@ -10,7 +10,7 @@ export const app = StyleSheet.create({
     // flex: 1,
     height: '100%',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   scrollViewHorizontal: {
     marginRight: -32

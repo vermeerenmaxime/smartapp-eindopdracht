@@ -85,7 +85,7 @@ const Register = ({ navigation }: any) => {
         >
           <View>
             <Text style={header.title}>Travler</Text>
-            <Text style={app.label}>Login with your account</Text>
+            <Text style={app.label}>Register your account</Text>
             <TextInput
               style={app.input}
               onChangeText={setUsername}

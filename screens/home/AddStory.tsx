@@ -223,7 +223,7 @@ const AddStory = ({ route, navigation }: any) => {
     return (
       <SafeAreaView>
         <View style={app.container}>
-          <Header title='Create' props={route.params} />
+          <Header title='Create' props={route.params} navigation={navigation}/>
 
           <SwitchHeader navigation={navigation}></SwitchHeader>
         </View>

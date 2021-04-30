@@ -1,13 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import { createStackNavigator } from '@react-navigation/stack'
+import React, { useState } from 'react'
 
 import {
   Text,
   View,
   TouchableOpacity,
-  ScrollView,
   Alert,
-  Button,
   TextInput,
   ActivityIndicator,
   KeyboardAvoidingView
@@ -19,16 +16,13 @@ import AppButton from '../../components/appButton'
 import { app } from '../../styles/app'
 import { header } from '../../styles/components/header'
 
-import { firestore, firebase } from '../../database/firebase'
+import { firebase } from '../../database/firebase'
 import {
-  userData,
   setUserData,
-  UserDataContext,
-  getUserData
 } from '../../database/databaseContext'
 import { color } from '../../styles/colors'
 
-const Login = ({ route, navigation }: any) => {
+const Login = ({ navigation }: any) => {
   const [email, setEmail] = useState('maxime6128@gmail.com')
   const [password, setPassword] = useState('Eeeeee')
 

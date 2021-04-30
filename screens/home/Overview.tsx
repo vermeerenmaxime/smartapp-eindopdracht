@@ -57,7 +57,7 @@ const Overview = ({ route, navigation }: any) => {
 
   return (
     <SafeAreaView style={app.container}>
-      <Header title='Home' props={route.params} />
+      <Header title='Home' props={route.params} navigation={navigation}/>
       <View
         style={{
           padding: 16,

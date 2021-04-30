@@ -106,8 +106,8 @@ const Profile = ({ route, navigation }: any) => {
         >
           <Header
             title='Profile'
-            subTitle={userData?.displayName}
             props={route.params}
+            navigation={navigation}
           />
           <SubTitle
             title='Trips in progress'
@@ -115,9 +115,10 @@ const Profile = ({ route, navigation }: any) => {
             onPress={() => navigation.navigate('AddStory')}
           />
 
-          {stories &&
-            stories.map((data, index) => {
-              if (data.private && data.image && data.title) {
+          {stories?.filter(data => data.private == true).length ? (
+            stories
+              .filter(data => data.private == true && data.image && data.title)
+              .map((data, index) => {
                 return (
                   <StoryBig
                     key={index}
@@ -131,13 +132,19 @@ const Profile = ({ route, navigation }: any) => {
                     }
                   />
                 )
-              }
-            })}
+              })
+          ) : (
+            <Text>
+              🌏 You haven't made any trips yet. Start exploring the world and
+              share your trips with all users on Travler!
+            </Text>
+          )}
           <SubTitle title='Published trips' />
 
-          {stories &&
-            stories.map((data, index) => {
-              if (!data.private) {
+          {stories?.filter(data => data.private == false).length ? (
+            stories
+              .filter(data => data.private == false)
+              .map((data, index) => {
                 return (
                   <StoryBig
                     key={index}
@@ -151,10 +158,13 @@ const Profile = ({ route, navigation }: any) => {
                     }
                   />
                 )
-              }
-            })}
-
-          <AppButton onPress={() => signOut()} title='Logout' />
+              })
+          ) : (
+            <Text>
+              😿 You don't have any trips published yet! Publish a story by
+              making your story not private anymore.
+            </Text>
+          )}
         </ScrollView>
       </SafeAreaView>
     )

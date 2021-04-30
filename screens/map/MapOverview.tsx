@@ -96,43 +96,78 @@ const mapOverview = ({ route, navigation }: any) => {
   }
 
   const storiesRef = firestore.collection('story')
-  const getUserStories = async () => {
-
-    let stories: StoryModel[] = []
+  const getUserMarkers = async () => {
+    // let stories: StoryModel[] = []
     await storiesRef
-      .where('author', '==', userData.uid)
       .get()
       .then(query => {
         query.forEach(doc => {
-          let newStory: StoryModel = {
-            id: doc.id,
-            title: doc.data().title,
-            image: doc.data().image,
-            private: doc.data().private,
-            author: doc.data().author,
-            description: doc.data().description,
-            likes: doc.data().likes,
-            lat: doc.data().lat,
-            long: doc.data().long
+          // let newStory: StoryModel = {
+          //   id: doc.id,
+          //   title: doc.data().title,
+          //   image: doc.data().image,
+          //   private: doc.data().private,
+          //   author: doc.data().author,
+          //   description: doc.data().description,
+          //   likes: doc.data().likes,
+          //   lat: doc.data().lat,
+          //   long: doc.data().long
+          // }
+          if (doc.data().latitude & doc.data().longitude) {
+            let marker = {
+              latitude: doc.data().lat,
+              longitude: doc.data().long,
+              title: doc.data().title,
+              subtitle: doc.data().description,
+              storyId: doc.id,
+              color: doc.data().author == userData.uid ? 'green' : 'blue'
+            }
+            setMarkers([...markers, marker])
           }
-          let marker = {
-            latitude: doc.data().lat,
-            longitude: doc.data().long,
-            title: doc.data().title,
-            subtitle: doc.data().description,
-            storyId: doc.id,
-            color: 'green'
-          }
-          setMarkers([...markers, marker])
-          stories.push(newStory)
+          // stories.push(newStory)
         })
-        setStories(stories)
+        // setStories(stories)
       })
       .catch((error: any) => {
         console.log('Error getting documents: ', error)
       })
     // return stories
   }
+
+  // const getAllMarkers = async () => {
+  //   await storiesRef
+  //     .where('author', '!=', userData.uid)
+  //     .get()
+  //     .then(query => {
+  //       query.forEach(doc => {
+  //         // let newStory: StoryModel = {
+  //         //   id: doc.id,
+  //         //   title: doc.data().title,
+  //         //   image: doc.data().image,
+  //         //   private: doc.data().private,
+  //         //   author: doc.data().author,
+  //         //   description: doc.data().description,
+  //         //   likes: doc.data().likes,
+  //         //   lat: doc.data().lat,
+  //         //   long: doc.data().long
+  //         // }
+  //         let marker = {
+  //           latitude: doc.data().lat,
+  //           longitude: doc.data().long,
+  //           title: doc.data().title,
+  //           subtitle: doc.data().description,
+  //           storyId: doc.id,
+  //           color: 'green'
+  //         }
+  //         setMarkers([...markers, marker])
+  //         // stories.push(newStory)
+  //       })
+  //       // setStories(stories)
+  //     })
+  //     .catch((error: any) => {
+  //       console.log('Error getting documents: ', error)
+  //     })
+  // }
 
   useFocusEffect(
     useCallback(() => {
@@ -141,7 +176,7 @@ const mapOverview = ({ route, navigation }: any) => {
   )
   useEffect(() => {
     setLoading(true)
-    getUserStories()
+    getUserMarkers()
     setLoading(false)
   }, [])
 
@@ -155,8 +190,9 @@ const mapOverview = ({ route, navigation }: any) => {
     return (
       <View style={styles.container}>
         <MapView style={styles.map} initialRegion={region}>
-          {markers.map((marker, index) => {
-            if (marker.longitude && marker.latitude) {
+          {markers
+            .filter(marker => marker.longitude && marker.latitude)
+            .map((marker, index) => {
               return (
                 <Marker
                   key={index}
@@ -176,9 +212,8 @@ const mapOverview = ({ route, navigation }: any) => {
                   }
                 />
               )
-            }
-          })}
-          {locationPermission ? (
+            })}
+          {locationPermission && (
             <Marker
               coordinate={{
                 latitude: region.latitude,
@@ -187,10 +222,8 @@ const mapOverview = ({ route, navigation }: any) => {
               pinColor={'red'} // any color
               title={'Current location'}
               description={''}
-              // onPress={() => navigation.navigate("AddStory", {})}
-              // press={console.log("hi")}
             />
-          ) : null}
+          )}
         </MapView>
       </View>
     )
