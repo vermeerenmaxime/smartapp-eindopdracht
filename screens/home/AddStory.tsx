@@ -188,10 +188,6 @@ const AddStory = ({ route, navigation }: any) => {
 
       const imageUrl = await uploadImage(imageName)
 
-      // getImageFromUpload(imageName)
-      // console.log('StoryimageUrl    =>', storyImageUrl)
-      // console.log(imageUrl)
-
       await firestore
         .collection('story')
         .add({

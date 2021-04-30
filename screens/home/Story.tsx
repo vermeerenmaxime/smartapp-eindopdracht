@@ -375,13 +375,22 @@ const Story = ({ route, navigation, user }: any) => {
           <View>
             <Text style={story.title}>{storyData?.title}</Text>
             <Text>{storyData?.description}</Text>
-            {!storyData?.lat ? (
-              <View
+            {(storyData?.lat && storyData?.long) && (
+              <TouchableOpacity
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
                   marginTop: 8
                 }}
+                onPress={() =>
+                  navigation.navigate('MapOverview', {
+                    region: {
+                      latitude: storyData?.lat,
+                      longitude: storyData?.long,
+        
+                    }
+                  })
+                }
               >
                 <View
                   style={{
@@ -393,8 +402,8 @@ const Story = ({ route, navigation, user }: any) => {
                   <FontAwesomeIcon icon={faMapMarkedAlt} size={16} style={{}} />
                 </View>
                 <Text style={{ padding: 8 }}>Go to location on map </Text>
-              </View>
-            ) : null}
+              </TouchableOpacity>
+            )}
           </View>
 
           {storyArticles ? (
@@ -419,24 +428,26 @@ const Story = ({ route, navigation, user }: any) => {
                   )}
 
                   <Text>{article.note}</Text>
-                  <ScrollView
-                    horizontal={true}
-                    style={[story.articleImages, app.scrollViewHorizontal]}
-                  >
-                    {article.images
-                      ? article.images.map((image, index) => {
-                          return (
-                            <ArticleImage
-                              key={index}
-                              uri={image}
-                              onPress={() => {
-                                clickImage(image)
-                              }}
-                            ></ArticleImage>
-                          )
-                        })
-                      : null}
-                  </ScrollView>
+                  {article.images && (
+                    <ScrollView
+                      horizontal={true}
+                      style={[story.articleImages, app.scrollViewHorizontal]}
+                    >
+                      {article.images
+                        ? article.images.map((image, index) => {
+                            return (
+                              <ArticleImage
+                                key={index}
+                                uri={image}
+                                onPress={() => {
+                                  clickImage(image)
+                                }}
+                              ></ArticleImage>
+                            )
+                          })
+                        : null}
+                    </ScrollView>
+                  )}
                 </View>
               )
             })

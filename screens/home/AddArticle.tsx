@@ -69,7 +69,7 @@ const AddArticle = ({ route, navigation }: any) => {
     setVisible(!visible)
   }
 
-  const [articleImages, setArticleImages] = useState([])
+  const [articleImages, setArticleImages] = useState<string[]>([])
 
   const clickImage = (image: any) => {
     setOverlayImage(image)
@@ -153,6 +153,7 @@ const AddArticle = ({ route, navigation }: any) => {
 
       setUploading(false)
       console.log('-- Image uploaded --')
+      console.log(url)
       return url
     } catch (e) {
       return null
@@ -167,37 +168,43 @@ const AddArticle = ({ route, navigation }: any) => {
       console.log('ArticleData:', articleData)
       console.log('ArticleImages:', articleImages)
       let articleImagesUrl: string[] = []
-      if (articleImages.length > 5) {
+      if (articleImages.length <= 5) {
         if (articleImages) {
-          articleImages.map(async (image, index) => {
-            let imageName = `article-${
-              userData?.uid
-            }-${new Date().getTime()}-${index}`
-            const imageUploadedUrl = await uploadImage(image, imageName)
-            articleImagesUrl.push(imageUploadedUrl)
-          })
+          await Promise.all(
+            articleImages.map(async (image, index) => {
+              let imageName = `article-${
+                userData?.uid
+              }-${new Date().getTime()}-${index}`
+
+              const imageUploadedUrl = await uploadImage(image, imageName)
+
+              articleImagesUrl.push(imageUploadedUrl)
+            })
+          )
+
+          console.log("ImageURL's =>", articleImagesUrl)
+          await firestore
+            .collection('article')
+            .add({
+              storyId: articleData?.storyId,
+              entryDate: articleData?.entryDate,
+              title: articleData?.title,
+              note: articleData?.note,
+              images: articleImagesUrl
+            })
+            .then(doc => {
+              console.log('Article succesfully added!')
+              navigation.navigate('Story', { storyId: articleData?.storyId })
+            })
+            .catch(error => {
+              console.error('Error adding article: ', error)
+            })
         }
-        await firestore
-          .collection('article')
-          .add({
-            storyId: articleData?.storyId,
-            entryDate: articleData?.entryDate,
-            title: articleData?.title,
-            note: articleData?.note,
-            images: articleImagesUrl
-          })
-          .then(() => {
-            console.log(articleStory, 'Article succesfully added!')
-            navigation.navigate('Story', { storyId: articleData?.storyId })
-          })
-          .catch(error => {
-            console.error('Error adding article: ', error)
-          })
       } else {
-        Alert.alert('Please fill in all fields')
+        Alert.alert('You can only add 5 images to 1 story')
       }
     } else {
-      Alert.alert('You can only add 5 images to 1 story')
+      Alert.alert('Please fill in all fields')
     }
   }
   return (

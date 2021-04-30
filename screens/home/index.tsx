@@ -5,6 +5,7 @@ import Overview from './Overview'
 import Story from './Story'
 import EditArticle from './EditArticle'
 import AddArticle from './AddArticle'
+import MapOverview from '../map/MapOverview'
 
 const Stack = createStackNavigator()
 
@@ -30,6 +31,11 @@ const Home = ({ route, navigation }: any) => {
       <Stack.Screen
         name='AddArticle'
         component={AddArticle}
+        initialParams={route.params}
+      ></Stack.Screen>
+      <Stack.Screen
+        name='MapOverview'
+        component={MapOverview}
         initialParams={route.params}
       ></Stack.Screen>
     </Stack.Navigator>

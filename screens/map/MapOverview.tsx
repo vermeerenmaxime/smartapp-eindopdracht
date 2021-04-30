@@ -92,10 +92,12 @@ const mapOverview = ({ route, navigation }: any) => {
         longitudeDelta: 0.15
       })
     }
+    setLoading(false)
   }
 
   const storiesRef = firestore.collection('story')
   const getUserStories = async () => {
+
     let stories: StoryModel[] = []
     await storiesRef
       .where('author', '==', userData.uid)
@@ -129,7 +131,7 @@ const mapOverview = ({ route, navigation }: any) => {
       .catch((error: any) => {
         console.log('Error getting documents: ', error)
       })
-    return stories
+    // return stories
   }
 
   useFocusEffect(
@@ -138,6 +140,7 @@ const mapOverview = ({ route, navigation }: any) => {
     }, [])
   )
   useEffect(() => {
+    setLoading(true)
     getUserStories()
     setLoading(false)
   }, [])
