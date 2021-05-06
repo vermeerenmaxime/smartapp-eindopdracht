@@ -8,7 +8,6 @@ import {
   ScrollView,
   Image,
   TextInput,
-  ActivityIndicator,
   Switch,
   RefreshControl
 } from 'react-native'
@@ -36,9 +35,9 @@ import AppButton from '../../components/appButton'
 import { Overlay } from 'react-native-elements'
 
 import { userData } from '../../database/databaseContext'
-import { color } from '../../styles/colors'
 
 import { wait } from '../../utils/wait'
+import Loader from '../../components/loader'
 
 const Story = ({ route, navigation, user }: any) => {
   const storyId = route.params.storyId
@@ -268,11 +267,7 @@ const Story = ({ route, navigation, user }: any) => {
   }, [])
 
   if (loading) {
-    return (
-      <View style={app.activityIndicator}>
-        <ActivityIndicator size='large' color={color.gray} />
-      </View>
-    )
+    return <Loader />
   } else {
     return (
       <ScrollView
@@ -417,7 +412,11 @@ const Story = ({ route, navigation, user }: any) => {
                   {article.images && (
                     <ScrollView
                       horizontal={true}
-                      style={[story.articleImages, app.scrollViewHorizontal]}
+                      style={[
+                        story.articleImages,
+                        app.scrollViewHorizontal,
+                        { marginTop: 24 }
+                      ]}
                     >
                       {article.images
                         ? article.images.map((image, index) => {

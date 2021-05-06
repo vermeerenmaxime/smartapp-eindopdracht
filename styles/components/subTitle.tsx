@@ -6,6 +6,7 @@ export const subtitle = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     flexDirection: "row",
+    width: "100%",
   },
   text: {
     paddingLeft: 8,

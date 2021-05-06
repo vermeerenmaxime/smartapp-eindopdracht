@@ -9,6 +9,7 @@ npm-debug.*
 *.orig.*
 web-build/
 database/admin/*
+featurelist.txt
 
 # macOS
 .DS_Store

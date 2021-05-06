@@ -92,7 +92,7 @@ const EditArticle = ({ route, navigation }: any) => {
   }
   const deleteArticle = async () => {
     setLoading(true)
-    await deleteArticleImages()
+    // await deleteArticleImages()
 
     firestore
       .collection('article')
