@@ -12,11 +12,9 @@ import {
   KeyboardAvoidingView,
   SkewXTransform,
   Platform,
-  Picker,
   ActivityIndicator
 } from 'react-native'
 
-import { Select, Option } from 'react-native-select-lists'
 // https://www.npmjs.com/package/react-native-lists-select
 
 import * as ImagePicker from 'expo-image-picker'
@@ -49,12 +47,18 @@ import {
 import { firebase, firestore } from '../../database/firebase'
 import { useFocusEffect } from '@react-navigation/native'
 import StoryModel from '../../models/Story'
+import PhotoPicker from '../../components/photoPicker'
+import StorySmall from '../../components/storySmall'
+import Loader from '../../components/loader'
 
 const AddArticle = ({ route, navigation }: any) => {
   const [visible, setVisible] = useState(false)
   const [overlayImage, setOverlayImage] = useState('')
+  const [loading, setLoading] = useState(true)
 
   const storyId = route.params.storyId ? route.params.storyId : ''
+  const [selectedStory, setSelectedStory] = useState(storyId)
+  const [userStories, setUserStories] = useState<StoryModel[]>()
 
   const [articleStory, setArticleStory] = useState('')
   const [articleData, setArticleData] = useState<ArticleModel>({
@@ -124,6 +128,36 @@ const AddArticle = ({ route, navigation }: any) => {
       setArticleImages([...articleImages, result.uri])
       console.log(articleImages)
     }
+  }
+
+  const storiesRef = firestore.collection('story')
+  const getUserStories = async () => {
+    let stories: StoryModel[] = []
+    await storiesRef
+      .where('author', '==', userData.uid)
+      .where('private', '==', true)
+      .get()
+      .then(query => {
+        query.forEach(doc => {
+          let newStory: StoryModel = {
+            id: doc.id,
+            title: doc.data().title,
+            image: doc.data().image,
+            private: doc.data().private,
+            author: doc.data().author,
+            description: doc.data().description,
+            likes: doc.data().likes,
+            lat: doc.data().lat,
+            long: doc.data().long
+          }
+          stories.push(newStory)
+        })
+        setUserStories(stories)
+      })
+      .catch((error: any) => {
+        console.log('Error getting documents: ', error)
+      })
+    return stories
   }
 
   const uploadImage = async (image: string, imageName: string) => {
@@ -207,127 +241,124 @@ const AddArticle = ({ route, navigation }: any) => {
       Alert.alert('Please fill in all fields')
     }
   }
-  return (
-    <SafeAreaView>
-      <View style={app.container}>
-        <Header title='Add' props={route.params} navigation={navigation}/>
-        <SwitchHeader navigation={navigation} selected></SwitchHeader>
-      </View>
-      <KeyboardAvoidingView
-        behavior='padding'
-        enabled
-        keyboardVerticalOffset={0}
-      >
-        <ScrollView style={app.container}>
-          <SubTitle title='Trip' />
-          <TextInput
+
+  useEffect(() => {
+    // getStories()
+    getUserStories()
+
+    setLoading(false)
+  }, [])
+  if (loading) {
+    return <Loader />
+  } else {
+    return (
+      <SafeAreaView>
+        <View style={app.container}>
+          <Header title='Add' props={route.params} navigation={navigation} />
+          <SwitchHeader navigation={navigation} selected></SwitchHeader>
+        </View>
+        <KeyboardAvoidingView
+          behavior='padding'
+          enabled
+          keyboardVerticalOffset={0}
+        >
+          <ScrollView style={app.container}>
+            <SubTitle title='Select Trip' />
+            {/* <TextInput
             placeholder='Trip..'
             style={app.input}
             placeholderTextColor={color.gray}
             editable={false}
             value={storyId}
-          ></TextInput>
+          ></TextInput> */}
+            <ScrollView
+              horizontal={true}
+              style={[story.articleImages, app.scrollViewHorizontal]}
+            >
+              {userStories?.filter(
+                data => data.private == true && data.image && data.title
+              ).length ? (
+                userStories
+                  ?.filter(
+                    data => data.private == true && data.image && data.title
+                  )
+                  .map(story => {
+                    // console.log(story)
+                    if (articleData.storyId == story.id) {
+                      return (
+                        <StorySmall
+                          key={story.id}
+                          title={story.title}
+                          image={story.image}
+                          onPress={() => {
+                            setArticleData((oldArticle: ArticleModel) => {
+                              oldArticle.storyId = story.id
+                              console.log(oldArticle.storyId)
+                              return { ...oldArticle }
+                            })
+                          }}
+                          selected
+                        />
+                      )
+                    } else {
+                      return (
+                        <StorySmall
+                          key={story.id}
+                          title={story.title}
+                          image={story.image}
+                          onPress={() => {
+                            setArticleData((oldArticle: ArticleModel) => {
+                              oldArticle.storyId = story.id
+                              console.log(oldArticle.storyId)
+                              return { ...oldArticle }
+                            })
+                          }}
+                        />
+                      )
+                    }
+                  })
+              ) : (
+                <Text>
+                  😨 You don't have any private trips yet to add articles to.
+                </Text>
+              )}
+            </ScrollView>
 
-          {/* <Picker
-            selectedValue={selectedValue}
-            style={{ height: 50, width: 150,margin:16 }}
-            onValueChange={(itemValue, itemIndex) =>
-              setSelectedValue(itemValue)
-            }
-          >
-            <Picker.Item label='Java' value='java' />
-            <Picker.Item label='JavaScript' value='js' />
-            <Picker.Item label='JavaScript' value='js' />
-            <Picker.Item label='JavaScript' value='js' />
-            <Picker.Item label='JavaScript' value='js' />
-            <Picker.Item label='JavaScript' value='js' />
-          </Picker> */}
-          {/* <Select
-            selectTextStyle={{
-              fontSize: 16,
-              paddingHorizontal: 8
-            }}
-            selectStyle={[
-              {
-                overflow: 'hidden',
-                padding: 0,
-                margin: 0,
-                backgroundColor: 'white',
-
-                borderRadius: 12,
-                height: 48
-              }
-            ]}
-            listStyle={{
-              backgroundColor: color.light,
-              borderColor: color.alpha,
-              borderWidth: 2,
-              shadowOpacity: 0.05,
-              elevation: 50,
-              shadowRadius: 50,
-              borderRadius: 8
-            }}
-            placeholder='Choose your trip'
-            // onChange={setArticleStory}
-            value={articleData?.storyId}
-          >
-            {userStories ? (
-              userStories.map((story, index) => {
-                return (
-                  <Option
-                    key={index}
-                    value={story.id}
-                    last={true}
-                    onPress={() => {
-                      // console.log("Hey")
-                      setArticleData((oldArticle: ArticleModel) => {
-                        oldArticle.storyId = story.id
-                        return { ...oldArticle }
-                      })
-                    }}
-                  >
-                    {story.title}
-                  </Option>
-                )
-              })
-            ) : (
-              <Option value={1}>No stories available</Option>
-            )}
-          </Select> */}
-          <SubTitle title='Article' />
-          <View style={app.input}>
-            <TextInput
-              placeholder='Title..'
-              style={[story.title]}
-              placeholderTextColor={color.gray}
-              onChangeText={(text: string) => {
-                setArticleData((oldArticle: ArticleModel) => {
-                  oldArticle.title = text
-                  return { ...oldArticle }
-                })
-              }}
-              value={articleData?.title}
-            ></TextInput>
-            <TextInput
-              placeholder='Write your experience down here..'
-              style={{ marginTop: 16 }}
-              placeholderTextColor={color.gray}
-              multiline={true}
-              onChangeText={(text: string) => {
-                setArticleData((oldArticle: ArticleModel) => {
-                  oldArticle.note = text
-                  return { ...oldArticle }
-                })
-              }}
-              value={articleData?.note}
-            ></TextInput>
-          </View>
-          <SubTitle title='Add pictures' />
-          <ScrollView
-            horizontal={true}
-            style={[story.articleImages, app.scrollViewHorizontal]}
-          >
-            <TouchableOpacity
+            <SubTitle title='Article' />
+            <View style={app.input}>
+              <TextInput
+                placeholder='Title..'
+                style={[story.title]}
+                placeholderTextColor={color.gray}
+                onChangeText={(text: string) => {
+                  setArticleData((oldArticle: ArticleModel) => {
+                    oldArticle.title = text
+                    return { ...oldArticle }
+                  })
+                }}
+                value={articleData?.title}
+              ></TextInput>
+              <TextInput
+                placeholder='Write your experience down here..'
+                style={{ marginTop: 16 }}
+                placeholderTextColor={color.gray}
+                multiline={true}
+                onChangeText={(text: string) => {
+                  setArticleData((oldArticle: ArticleModel) => {
+                    oldArticle.note = text
+                    return { ...oldArticle }
+                  })
+                }}
+                value={articleData?.note}
+              ></TextInput>
+            </View>
+            <SubTitle title='Add pictures' />
+            <ScrollView
+              horizontal={true}
+              style={[story.articleImages, app.scrollViewHorizontal]}
+            >
+              <PhotoPicker onPress={pickImage}></PhotoPicker>
+              {/* <TouchableOpacity
               style={[story.articleImage, { backgroundColor: 'white' }]}
               onPress={pickImage}
             >
@@ -336,70 +367,72 @@ const AddArticle = ({ route, navigation }: any) => {
                 size={24}
                 color={color.lightGray}
               />
-            </TouchableOpacity>
-            {articleImages
-              ? articleImages.map((image, index) => {
-                  return (
-                    <ArticleImage
-                      key={index}
-                      uri={image}
-                      onPress={() => {
-                        clickImage(image)
-                      }}
-                      onLongPress={() => deleteImage(image)}
-                    ></ArticleImage>
-                  )
-                })
-              : null}
-          </ScrollView>
-          {uploading ? (
-            <View style={{ marginTop: 16 }}>
-              {transferred == 100 ? (
-                <SubTitle title='Image succesfully uploaded!'></SubTitle>
-              ) : (
-                <View>
-                  <SubTitle title='Uploading image'></SubTitle>
-                  <Text>{transferred}% completed!</Text>
-                  <ActivityIndicator size='large' color={color.gray} />
-                </View>
-              )}
-            </View>
-          ) : (
-            <AppButton
-              title='Add to trip'
-              style={{
-                width: '50%',
-                alignSelf: 'flex-end',
-                marginTop: 16,
-                marginBottom: 200
-              }}
-              onPress={() => addArticle()}
-            />
-          )}
-        </ScrollView>
-      </KeyboardAvoidingView>
-      <Overlay
-        isVisible={visible}
-        onBackdropPress={toggleOverlay}
-        overlayStyle={{
-          width: '90%',
+            </TouchableOpacity> */}
+              {articleImages
+                ? articleImages.map((image, index) => {
+                    return (
+                      <ArticleImage
+                        key={index}
+                        uri={image}
+                        onPress={() => {
+                          clickImage(image)
+                        }}
+                        onLongPress={() => deleteImage(image)}
+                      ></ArticleImage>
+                    )
+                  })
+                : null}
+            </ScrollView>
 
-          padding: 0,
-          borderRadius: 12,
-          overflow: 'hidden'
-        }}
-      >
-        <Image
-          source={{ uri: overlayImage }}
-          style={{
-            width: '100%',
-            height: 500
+            {uploading ? (
+              <View style={{ marginTop: 16 }}>
+                {transferred == 100 ? (
+                  <SubTitle title='Image succesfully uploaded!'></SubTitle>
+                ) : (
+                  <View>
+                    <SubTitle title='Uploading image'></SubTitle>
+                    <Text>{transferred}% completed!</Text>
+                    <ActivityIndicator size='large' color={color.gray} />
+                  </View>
+                )}
+              </View>
+            ) : (
+              <AppButton
+                title='Add to trip'
+                style={{
+                  width: '50%',
+                  alignSelf: 'flex-end',
+                  marginTop: 16,
+                  marginBottom: 200
+                }}
+                onPress={() => addArticle()}
+              />
+            )}
+          </ScrollView>
+        </KeyboardAvoidingView>
+        <Overlay
+          isVisible={visible}
+          onBackdropPress={toggleOverlay}
+          overlayStyle={{
+            width: '90%',
+
+            padding: 0,
+            borderRadius: 12,
+            overflow: 'hidden'
           }}
-          resizeMode='cover'
-        ></Image>
-      </Overlay>
-    </SafeAreaView>
-  )
+        >
+          <Image
+            source={{ uri: overlayImage }}
+            style={{
+              width: '100%',
+              height: 500
+            }}
+            resizeMode='cover'
+          ></Image>
+        </Overlay>
+      </SafeAreaView>
+    )
+  }
 }
 
 export default AddArticle

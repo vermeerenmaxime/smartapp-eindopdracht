@@ -33,7 +33,8 @@ export const story = StyleSheet.create({
   },
   smallImage: {
     width: '100%',
-    height: '100%'
+    height: '100%',
+    overflow: 'hidden'
   },
   smallText: {
     padding: 8,

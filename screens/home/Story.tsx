@@ -49,10 +49,7 @@ const wait = (timeout: number) => {
 }
 
 const Story = ({ route, navigation, user }: any) => {
-  const imageUrl = {
-    uri:
-      'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2F6%2F67%2FGeirangerfjord%252C_Norway_%2528Unsplash%2529.jpg%2F640px-Geirangerfjord%252C_Norway_%2528Unsplash%2529.jpg&f=1&nofb=1'
-  }
+
   const storyId = route.params.storyId
 
   const [storyData, setStoryData] = useState<StoryModel>({

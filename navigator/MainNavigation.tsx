@@ -15,6 +15,7 @@ import Home from '../screens/home'
 import User from '../screens/user'
 import Add from '../screens/add'
 import Map from '../screens/map'
+import Fy from '../screens/fy'
 
 import { color } from '../styles/colors'
 
@@ -28,81 +29,16 @@ import {
   faPlus,
   faUser
 } from '@fortawesome/free-solid-svg-icons'
-import { firebase, firestore } from '../database/firebase'
-import UserModule from '../models/User'
-
-function Fy ({}) {
-  return <Text>fy</Text>
-}
-// function Map({}) {
-//   return <Text>fy</Text>;
-// }
-
-function CustomTabBar ({ navigation, state, position }: any) {
-  return (
-    <View style={navigationBottom.TabBarMainContainer}>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Overview')}
-        activeOpacity={0.6}
-        style={navigationBottom.button}
-      >
-        <Ionicons name='book' size={12} color='white' />
-        <Text style={navigationBottom.TextStyle}>home </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        // onPress={() => {navigation.navigate("Fy")}}
-        onPress={() => console.log('test')}
-        activeOpacity={0.6}
-        style={navigationBottom.button}
-      >
-        <Ionicons name='globe' size={12} color='white' />
-        <Text style={navigationBottom.TextStyle}>fy</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => navigation.navigate('MainNavigation', { screen: 'Add' })}
-        activeOpacity={0.6}
-        style={navigationBottom.buttonAdd}
-      >
-        <Text style={navigationBottom.buttonAddTextStyle}> + </Text>
-      </TouchableOpacity>
-
-      {/*
-      <TouchableOpacity
-        onPress={props.navigation.navigate("TabNavigation", { screen: "Map" })}
-        activeOpacity={0.6}
-        style={styles.button}
-      >
-        <Ionicons name="compass" size="12" color="white" />
-
-        <Text style={styles.TextStyle}>map</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={props.navigation.navigate("TabNavigation", { screen: "User" })}
-        activeOpacity={0.6}
-        style={styles.button}
-      >
-        <Text style={styles.TextStyle}>me</Text>
-      </TouchableOpacity> */}
-    </View>
-  )
-}
 
 export default function MainNavigation ({ route, navigation }: any) {
   return (
     <Tab.Navigator
-      // tabBar={(props) => <CustomTabBar {...props} />}
-      // screenOptions={customTabOptions}
       tabBarOptions={{
         inactiveTintColor: color.light,
         activeTintColor: color.alpha,
 
         tabStyle: {},
-        safeAreaInsets: {
-          //bottom:0
-        },
+
         style: {
           borderTopWidth: 0,
           backgroundColor: '#312F2F'
@@ -123,7 +59,7 @@ export default function MainNavigation ({ route, navigation }: any) {
         initialParams={route.params}
         options={{
           title: '',
-          tabBarIcon: ({ size, focused }) => {
+          tabBarIcon: () => {
             return (
               <FontAwesomeIcon
                 icon={faHome}
@@ -139,7 +75,7 @@ export default function MainNavigation ({ route, navigation }: any) {
         component={Fy}
         options={{
           title: '',
-          tabBarIcon: ({ size, focused }) => {
+          tabBarIcon: () => {
             return (
               <FontAwesomeIcon
                 icon={faGlobeEurope}
@@ -156,7 +92,7 @@ export default function MainNavigation ({ route, navigation }: any) {
         initialParams={route.params}
         options={{
           title: '',
-          tabBarIcon: ({ size, focused }) => {
+          tabBarIcon: () => {
             return (
               <View
                 style={{
@@ -181,7 +117,7 @@ export default function MainNavigation ({ route, navigation }: any) {
         initialParams={route.params}
         options={{
           title: '',
-          tabBarIcon: ({ size, focused }) => {
+          tabBarIcon: () => {
             return (
               <FontAwesomeIcon
                 icon={faMapMarkedAlt}
@@ -198,7 +134,7 @@ export default function MainNavigation ({ route, navigation }: any) {
         initialParams={route.params}
         options={{
           title: '',
-          tabBarIcon: ({ size, focused }) => {
+          tabBarIcon: () => {
             return (
               <FontAwesomeIcon
                 icon={faUser}

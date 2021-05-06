@@ -36,6 +36,7 @@ import AppButton from '../../components/appButton'
 import { firebase, firestore } from '../../database/firebase'
 import StoryModel from '../../models/Story'
 import { userData } from '../../database/databaseContext'
+import Loader from '../../components/loader'
 
 const AddStory = ({ route, navigation }: any) => {
   const [storyPrivate, setStoryPrivate] = useState(true)
@@ -48,7 +49,7 @@ const AddStory = ({ route, navigation }: any) => {
 
   const [storyData, setStoryData] = useState<StoryModel>({
     entryDate: new Date().toLocaleString(),
-    author: '',
+    author: userData?.uid,
     description: '',
     image: '',
     likes: 0,
@@ -131,12 +132,7 @@ const AddStory = ({ route, navigation }: any) => {
 
     const storageRef = firebase.storage().ref('images/' + imageName)
     const task = storageRef.put(blob)
-    // let ref = firebase
-    //   .storage()
-    //   .ref()
-    //   .child('images/' + imageName)
 
-    // const task = ref.put(blob)
 
     task.on('state_changed', taskSnapshot => {
       console.log(
@@ -161,25 +157,6 @@ const AddStory = ({ route, navigation }: any) => {
     }
   }
 
-  const getImageFromUpload = async (imageName: any) => {
-    let storage = firebase.storage()
-    let storageRef = storage.ref()
-    let starsRef = storageRef.child('images/' + imageName)
-
-    // Geen await anders geeft hij geen url
-    starsRef
-      .getDownloadURL()
-      .then((url: string) => {
-        console.log(url)
-        setStoryImageUrl(url)
-        console.log('(url) ', storyImageUrl)
-      })
-      .catch(error => {
-        console.log('error', error)
-        setStoryImage('NoImgFound')
-      })
-  }
-
   const createStory = async () => {
     if (storyTitle && storyDescription && storyImage) {
       let imageName = `story-${userData?.uid}-${new Date().getTime()}`
@@ -196,7 +173,7 @@ const AddStory = ({ route, navigation }: any) => {
           title: storyTitle,
           image: imageUrl,
           imageName: imageName,
-          author: storyAuthor,
+          author: storyData?.author,
           likes: 0,
           private: storyPrivate,
           lat: region.latitude,
@@ -214,11 +191,7 @@ const AddStory = ({ route, navigation }: any) => {
     }
   }
   if (loading) {
-    return (
-      <View style={app.activityIndicator}>
-        <ActivityIndicator size='large' color={color.gray} />
-      </View>
-    )
+    return <Loader />
   } else {
     return (
       <SafeAreaView>

@@ -15,37 +15,28 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import SubTitle from '../../components/subTitle'
 
+import * as ImagePicker from 'expo-image-picker'
+
 import { app } from '../../styles/app'
 import { story } from '../../styles/components/story'
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import {
-  faHeart,
-  faPencilAlt,
-  faTrashAlt
-} from '@fortawesome/free-solid-svg-icons'
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { firebase, firestore } from '../../database/firebase'
 import { useFocusEffect } from '@react-navigation/native'
 
-import StoryModel from '../../models/Story'
 import ArticleModel from '../../models/Article'
 import { color } from '../../styles/colors'
 import AppButton from '../../components/appButton'
 import ArticleImage from '../../components/articleImage'
 import { header } from '../../styles/components/header'
 import { Overlay } from 'react-native-elements'
-
-const Stack = createStackNavigator()
+import Loader from '../../components/loader'
 
 const EditArticle = ({ route, navigation }: any) => {
-  const imageUrl = {
-    uri:
-      'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2F6%2F67%2FGeirangerfjord%252C_Norway_%2528Unsplash%2529.jpg%2F640px-Geirangerfjord%252C_Norway_%2528Unsplash%2529.jpg&f=1&nofb=1'
-  }
   const articleId = route.params.articleId
   const article = route.params.article
   const story = route.params.story
-  const storyId = route.params.storyId
 
   const [articleData, setArticleData] = useState<ArticleModel>(article)
 
@@ -61,13 +52,13 @@ const EditArticle = ({ route, navigation }: any) => {
     toggleOverlay()
   }
 
-  const [articleImages, setArticleImages] = useState(article.images)
+  const [articleImages, setArticleImages] = useState<string[]>(article.images)
   const [loading, setLoading] = useState(true)
 
-  const updateArticle = () => {
+  const updateArticle = async () => {
     setLoading(true)
 
-    firestore
+    await firestore
       .collection('article')
       .doc(articleId)
       .update({
@@ -85,11 +76,11 @@ const EditArticle = ({ route, navigation }: any) => {
       })
   }
 
-  const deleteArticleImages = () => {
+  const deleteArticleImages = async () => {
     for (let articleImage in articleImages) {
       let pictureRef = firebase.storage().refFromURL(`${articleImage}`)
 
-      pictureRef
+      await pictureRef
         .delete()
         .then(() => {
           console.log('-- Article picture removed from firebase storage')
@@ -99,9 +90,9 @@ const EditArticle = ({ route, navigation }: any) => {
         })
     }
   }
-  const deleteArticle = () => {
+  const deleteArticle = async () => {
     setLoading(true)
-    // deleteArticleImages()
+    await deleteArticleImages()
 
     firestore
       .collection('article')
@@ -125,9 +116,8 @@ const EditArticle = ({ route, navigation }: any) => {
 
   useFocusEffect(
     useCallback(() => {
-      // getArticle(articleId)
       setArticleData(article)
-      // setArticleImages(articleData.images)
+
       console.log(articleImages)
       console.log('ArticleId', articleId)
       setLoading(false)
@@ -135,7 +125,7 @@ const EditArticle = ({ route, navigation }: any) => {
   )
 
   if (loading) {
-    return <ActivityIndicator></ActivityIndicator>
+    return <Loader />
   } else {
     return (
       <SafeAreaView>
@@ -179,6 +169,7 @@ const EditArticle = ({ route, navigation }: any) => {
                 { paddingVertical: 16 }
               ]}
             >
+              {/* <PhotoPicker onPress={pickImage}></PhotoPicker> */}
               {articleImages
                 ? articleImages.map((image: string, index: Number) => {
                     return (
@@ -194,6 +185,7 @@ const EditArticle = ({ route, navigation }: any) => {
                   })
                 : null}
             </ScrollView>
+
             <View
               style={{
                 flexDirection: 'row',

@@ -33,8 +33,6 @@ const Header = ({ title, subTitle, props, navigation }: any) => {
     photoURL: ''
   })
 
-  // console.log(newUserData)
-
   const updateUser = () => {
     console.log('update', userData?.uid)
     firestore
@@ -43,7 +41,7 @@ const Header = ({ title, subTitle, props, navigation }: any) => {
       .update({
         displayName: newUserData?.displayName,
         email: newUserData?.email,
-        photoURL: newUserData?.photoURL
+        photoURL: newUserData?.photoURL,
       })
       .then(() => {
         Alert.alert('Profile succesfully updated')
@@ -95,10 +93,7 @@ const Header = ({ title, subTitle, props, navigation }: any) => {
         <Text style={header.title}>{title}</Text>
       </View>
       <View>
-        <TouchableOpacity
-          onPress={() => toggleOverlay()}
-          style={header.avatar}
-        >
+        <TouchableOpacity onPress={() => toggleOverlay()} style={header.avatar}>
           <View style={header.notificationCircle}>
             <Text style={header.notificationCircleText}>1</Text>
           </View>
