@@ -49,7 +49,6 @@ const wait = (timeout: number) => {
 }
 
 const Story = ({ route, navigation, user }: any) => {
-
   const storyId = route.params.storyId
 
   const [storyData, setStoryData] = useState<StoryModel>({
@@ -93,7 +92,7 @@ const Story = ({ route, navigation, user }: any) => {
     await storiesRef
       .doc(storyId)
       .get()
-      .then(doc => {
+      .then((doc: any) => {
         let getStoryData: any = doc.data()
         console.log(getStoryData)
         setStoryData(getStoryData)
@@ -108,9 +107,9 @@ const Story = ({ route, navigation, user }: any) => {
       .where('storyId', '==', storyId)
       .orderBy('entryDate', 'asc')
       .get()
-      .then(query => {
+      .then((query: any) => {
         let articles: any = []
-        query.forEach(doc => {
+        query.forEach((doc: any) => {
           let newArticle = {
             id: doc.id,
             entryDate: doc.data().entryDate,
@@ -133,17 +132,19 @@ const Story = ({ route, navigation, user }: any) => {
     await authorRef
       .doc(storyData?.author)
       .get()
-      .then(doc => {
-        let author: UserModel = {
-          uid: doc.id,
-          displayName: doc.data()?.displayName,
-          email: doc.data()?.email,
-          photoURL: doc.data()?.photoURL
+      .then(
+        (doc: any) => {
+          let author: UserModel = {
+            uid: doc.id,
+            displayName: doc.data()?.displayName,
+            email: doc.data()?.email,
+            photoURL: doc.data()?.photoURL
+          }
+          setStoryAuthor(author)
+          // let author: any = doc.data()
+          // return author;
         }
-        setStoryAuthor(author)
-        // let author: any = doc.data()
-        // return author;
-      })
+      )
       .catch((error: any) => {
         console.log('Error getting documents: ', error)
       })
@@ -165,7 +166,7 @@ const Story = ({ route, navigation, user }: any) => {
       .then(() => {
         console.log('-- Story updated firestore database')
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.error('Error updating document: ', error)
       })
     setLoading(false)
@@ -188,7 +189,7 @@ const Story = ({ route, navigation, user }: any) => {
       .then(() => {
         console.log('-- Story liked')
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.error('Error updating document: ', error)
       })
 
@@ -202,7 +203,7 @@ const Story = ({ route, navigation, user }: any) => {
       .then(() => {
         console.log('-- Story picture removed from firebase storage')
       })
-      .catch(err => {
+      .catch((err: any) => {
         console.log(err)
       })
   }
@@ -219,7 +220,7 @@ const Story = ({ route, navigation, user }: any) => {
 
         navigation.navigate('Profile')
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.error('Error removing document: ', error)
       })
     setLoading(false)
@@ -372,7 +373,7 @@ const Story = ({ route, navigation, user }: any) => {
           <View>
             <Text style={story.title}>{storyData?.title}</Text>
             <Text>{storyData?.description}</Text>
-            {(storyData?.lat && storyData?.long) && (
+            {storyData?.lat && storyData?.long && (
               <TouchableOpacity
                 style={{
                   flexDirection: 'row',
@@ -383,8 +384,7 @@ const Story = ({ route, navigation, user }: any) => {
                   navigation.navigate('MapOverview', {
                     region: {
                       latitude: storyData?.lat,
-                      longitude: storyData?.long,
-        
+                      longitude: storyData?.long
                     }
                   })
                 }

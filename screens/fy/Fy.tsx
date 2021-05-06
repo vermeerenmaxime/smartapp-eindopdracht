@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react'
 
-import { Text, View, ScrollView } from 'react-native'
+import {
+  Text,
+  View,
+  ScrollView,
+  ImageBackground,
+  TouchableOpacity
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { firebase, firestore } from '../../database/firebase'
@@ -10,6 +16,7 @@ import { app } from '../../styles/app'
 import StoryModel from '../../models/Story'
 import { userData } from '../../database/databaseContext'
 import Header from '../../components/header'
+import { color } from '../../styles/colors'
 
 const Fy = ({ route, navigation }: any) => {
   const [loading, setLoading] = useState(true)
@@ -32,11 +39,12 @@ const Fy = ({ route, navigation }: any) => {
     let stories: StoryModel[] = []
     await storiesRef
       .where('author', '!=', userData.uid)
-      .orderBy('entryDate', 'asc')
+      .orderBy('author', 'asc')
+      .orderBy('entryDate', 'desc')
       .limit(10)
       .get()
-      .then(query => {
-        query.forEach(doc => {
+      .then((query: any) => {
+        query.forEach((doc: any) => {
           let newStory: StoryModel = {
             id: doc.id,
             title: doc.data().title,
@@ -68,22 +76,74 @@ const Fy = ({ route, navigation }: any) => {
   } else {
     return (
       <SafeAreaView>
-        <ScrollView style={app.container}>
+        <ScrollView style={[app.container, { height: '100%' }]}>
           <Header
             title='For You'
             props={route.params}
             navigation={navigation}
           />
 
-          {stories &&
+          {stories?.length ? (
             stories.map(story => {
-              console.log('hi')
               return (
-                <View style={{ backgroundColor: 'red', height: '100%' }}>
-                  <Text>{story.title}</Text>
-                </View>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('Story', { storyId: story.id })
+                  }
+                  key={story.id}
+                  style={{
+                    marginTop: 24,
+                    backgroundColor: color.light,
+                    // height: '100%',
+                    borderRadius: 12,
+                    overflow: 'hidden',
+
+                    shadowColor: "black",
+                    shadowOpacity: 0.1,
+                    shadowRadius: 25
+                  }}
+                >
+                  <ImageBackground
+                    style={{
+                      backgroundColor: color.alpha,
+                      height: 200,
+                      width: '100%'
+                    }}
+                    source={{ uri: story.image }}
+                  ></ImageBackground>
+                  <Text
+                    style={{ padding: 16, fontSize: 18, fontWeight: 'bold' }}
+                  >
+                    {story.title}
+                  </Text>
+                  <Text style={{ paddingHorizontal: 16, paddingBottom: 20 }}>
+                    {story.description}
+                  </Text>
+                </TouchableOpacity>
               )
-            })}
+            })
+          ) : (
+            <View
+              style={{
+                paddingVertical: 32,
+                // height: '100%',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}
+            >
+              <Text
+                style={{
+                  padding: 16,
+                  backgroundColor: 'white',
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  width: '100%'
+                }}
+              >
+                😿 There are no stories available to view.
+              </Text>
+            </View>
+          )}
         </ScrollView>
       </SafeAreaView>
     )

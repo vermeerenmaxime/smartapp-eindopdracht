@@ -10,7 +10,7 @@ import {
   TextInput,
   Image,
   KeyboardAvoidingView,
-  SkewXTransform,
+
   Platform,
   ActivityIndicator
 } from 'react-native'
@@ -18,14 +18,12 @@ import {
 // https://www.npmjs.com/package/react-native-lists-select
 
 import * as ImagePicker from 'expo-image-picker'
-import Constants from 'expo-constants'
 
-import { Button, Overlay } from 'react-native-elements'
+import { Overlay } from 'react-native-elements'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { app } from '../../styles/app'
 import { color } from '../../styles/colors'
-import { switchHeader } from '../../styles/components/switchHeader'
 import { story } from '../../styles/components/story'
 
 import Header from '../../components/header'
@@ -34,8 +32,6 @@ import ArticleImage from '../../components/articleImage'
 import SwitchHeader from '../../components/switchHeader'
 import AppButton from '../../components/appButton'
 
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
 
 import ArticleModel from '../../models/Article'
 import {
@@ -137,8 +133,8 @@ const AddArticle = ({ route, navigation }: any) => {
       .where('author', '==', userData.uid)
       .where('private', '==', true)
       .get()
-      .then(query => {
-        query.forEach(doc => {
+      .then((query: any) => {
+        query.forEach((doc: any) => {
           let newStory: StoryModel = {
             id: doc.id,
             title: doc.data().title,
@@ -170,7 +166,7 @@ const AddArticle = ({ route, navigation }: any) => {
     const storageRef = firebase.storage().ref('images/' + imageName)
     const task = storageRef.put(blob)
 
-    task.on('state_changed', taskSnapshot => {
+    task.on('state_changed', (taskSnapshot: { bytesTransferred: number; totalBytes: number }) => {
       console.log(
         `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`
       )
@@ -226,11 +222,11 @@ const AddArticle = ({ route, navigation }: any) => {
               note: articleData?.note,
               images: articleImagesUrl
             })
-            .then(doc => {
+            .then(() => {
               console.log('Article succesfully added!')
               navigation.navigate('Story', { storyId: articleData?.storyId })
             })
-            .catch(error => {
+            .catch((error: any) => {
               console.error('Error adding article: ', error)
             })
         }

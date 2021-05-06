@@ -45,7 +45,7 @@ const Register = ({ navigation }: any) => {
             .collection('user')
             .doc(res.user.userId)
             .set({
-              uid:res.user.uid,
+              uid: res.user.uid,
               displayName: res.user.displayName,
               email: res.user.email,
               photoURL: res.user.photoURL
@@ -63,7 +63,7 @@ const Register = ({ navigation }: any) => {
             email: 'test'
           })
         })
-        .catch(error => {
+        .catch((error: any) => {
           alert(error)
           setLoading(false)
         })

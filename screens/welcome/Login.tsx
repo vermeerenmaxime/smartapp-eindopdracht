@@ -17,10 +17,9 @@ import { app } from '../../styles/app'
 import { header } from '../../styles/components/header'
 
 import { firebase } from '../../database/firebase'
-import {
-  setUserData,
-} from '../../database/databaseContext'
+import { setUserData } from '../../database/databaseContext'
 import { color } from '../../styles/colors'
+import Loader from '../../components/loader'
 
 const Login = ({ navigation }: any) => {
   const [email, setEmail] = useState('maxime6128@gmail.com')
@@ -37,31 +36,23 @@ const Login = ({ navigation }: any) => {
         .auth()
         .signInWithEmailAndPassword(email, password)
         .then((res: any) => {
-          // console.log(res);
           console.log('-- User successfully logged in : ', res.user.displayName)
           setLoading(false)
           setEmail('')
           setPassword('')
 
           setUserData(res.user)
-          // console.log(userData[0]);
 
-          navigation.navigate('TabNavigation', {
-            // user: res.user,
-          })
+          navigation.navigate('TabNavigation', {})
         })
-        .catch(error => {
+        .catch((error: any) => {
           alert(error)
           setLoading(false)
         })
     }
   }
   if (loading) {
-    return (
-      <View style={app.activityIndicator}>
-        <ActivityIndicator size='large' color={color.gray} />
-      </View>
-    )
+    return <Loader />
   } else {
     return (
       <SafeAreaView style={[app.container, app.containerWelcome]}>
@@ -86,7 +77,7 @@ const Login = ({ navigation }: any) => {
               placeholder='Password..'
               secureTextEntry={true}
             />
-            
+
             <AppButton onPress={() => userLogin()} title='Login' />
             <TouchableOpacity
               onPress={() => {

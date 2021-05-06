@@ -134,7 +134,7 @@ const AddStory = ({ route, navigation }: any) => {
     const task = storageRef.put(blob)
 
 
-    task.on('state_changed', taskSnapshot => {
+    task.on('state_changed', (taskSnapshot: { bytesTransferred: number; totalBytes: number }) => {
       console.log(
         `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`
       )
@@ -179,11 +179,11 @@ const AddStory = ({ route, navigation }: any) => {
           lat: region.latitude,
           long: region.longitude
         })
-        .then(doc => {
+        .then((doc: any) => {
           console.log('Story succesfully created!', doc)
           navigation.navigate('Story', { storyId: doc.id, edit: true })
         })
-        .catch(error => {
+        .catch((error: any) => {
           console.error('Error writing document: ', error)
         })
     } else {

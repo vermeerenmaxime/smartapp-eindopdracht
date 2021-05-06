@@ -71,7 +71,7 @@ const EditArticle = ({ route, navigation }: any) => {
         navigation.navigate('Story', { storyId: story.id })
         setLoading(false)
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.error('Error updating document: ', error)
       })
   }
@@ -85,7 +85,7 @@ const EditArticle = ({ route, navigation }: any) => {
         .then(() => {
           console.log('-- Article picture removed from firebase storage')
         })
-        .catch(err => {
+        .catch((err: any) => {
           console.log(err)
         })
     }
@@ -102,7 +102,7 @@ const EditArticle = ({ route, navigation }: any) => {
         console.log('-- Story removed from firestore database')
         navigation.navigate('Story', { storyId: story.id })
       })
-      .catch(error => {
+      .catch((error: any) => {
         console.error('Error removing document: ', error)
       })
     setLoading(false)

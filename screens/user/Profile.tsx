@@ -13,6 +13,7 @@ import {
 
 import AppButton from '../../components/appButton'
 import Header from '../../components/header'
+import Loader from '../../components/loader'
 import StoryBig from '../../components/storyBig'
 import SubTitle from '../../components/subTitle'
 import {
@@ -59,8 +60,8 @@ const Profile = ({ route, navigation }: any) => {
     await storiesRef
       .where('author', '==', userData.uid)
       .get()
-      .then(query => {
-        query.forEach(doc => {
+      .then((query: any) => {
+        query.forEach((doc: any) => {
           let newStory: StoryModel = {
             id: doc.id,
             title: doc.data().title,
@@ -90,11 +91,7 @@ const Profile = ({ route, navigation }: any) => {
   }, [])
 
   if (loading) {
-    return (
-      <View style={app.activityIndicator}>
-        <ActivityIndicator size='large' color={color.gray} />
-      </View>
-    )
+    return <Loader></Loader>
   } else {
     return (
       <SafeAreaView>

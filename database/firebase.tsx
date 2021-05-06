@@ -1,6 +1,6 @@
 // https://www.positronx.io/react-native-firebase-login-and-user-registration-tutorial/
 
-import * as fire from "firebase";
+import fire from "firebase";
 import "@firebase/firestore";
 
 const firebaseConfig = {

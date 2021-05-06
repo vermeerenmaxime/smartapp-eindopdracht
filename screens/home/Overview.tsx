@@ -37,8 +37,8 @@ const Overview = ({ route, navigation }: any) => {
       .where('private', '==', false)
       .limit(5)
       .get()
-      .then(query => {
-        query.forEach(doc => {
+      .then((query: any) => {
+        query.forEach((doc: any) => {
           let story: StoryModel = {
             id: doc.id,
             title: doc.data().title,
@@ -118,21 +118,6 @@ const Overview = ({ route, navigation }: any) => {
               )
             })}
         </ScrollView>
-        {/* <SubTitle title='Verified stories' />
-        <ScrollView horizontal={true} style={app.scrollViewHorizontal}>
-          <StorySmall
-            title='Norway Trip 2021'
-            onPress={() => navigation.navigate('Story', { storyId: 1 })}
-          />
-          <StorySmall
-            title='Norway Trip 2021'
-            onPress={() => navigation.navigate('Story', { storyId: 1 })}
-          />
-          <StorySmall
-            title='Norway Trip 2021'
-            onPress={() => navigation.navigate('Story', { storyId: 1 })}
-          />
-        </ScrollView> */}
       </SafeAreaView>
     </ScrollView>
   )

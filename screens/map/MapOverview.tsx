@@ -1,5 +1,6 @@
 import * as React from 'react'
 import MapView from 'react-native-map-clustering'
+
 import { Marker } from 'react-native-maps'
 import {
   StyleSheet,
@@ -100,19 +101,8 @@ const mapOverview = ({ route, navigation }: any) => {
     // let stories: StoryModel[] = []
     await storiesRef
       .get()
-      .then(query => {
-        query.forEach(doc => {
-          // let newStory: StoryModel = {
-          //   id: doc.id,
-          //   title: doc.data().title,
-          //   image: doc.data().image,
-          //   private: doc.data().private,
-          //   author: doc.data().author,
-          //   description: doc.data().description,
-          //   likes: doc.data().likes,
-          //   lat: doc.data().lat,
-          //   long: doc.data().long
-          // }
+      .then((query: any) => {
+        query.forEach((doc: any) => {
           if (doc.data().latitude & doc.data().longitude) {
             let marker = {
               latitude: doc.data().lat,
@@ -124,50 +114,12 @@ const mapOverview = ({ route, navigation }: any) => {
             }
             setMarkers([...markers, marker])
           }
-          // stories.push(newStory)
         })
-        // setStories(stories)
       })
       .catch((error: any) => {
         console.log('Error getting documents: ', error)
       })
-    // return stories
   }
-
-  // const getAllMarkers = async () => {
-  //   await storiesRef
-  //     .where('author', '!=', userData.uid)
-  //     .get()
-  //     .then(query => {
-  //       query.forEach(doc => {
-  //         // let newStory: StoryModel = {
-  //         //   id: doc.id,
-  //         //   title: doc.data().title,
-  //         //   image: doc.data().image,
-  //         //   private: doc.data().private,
-  //         //   author: doc.data().author,
-  //         //   description: doc.data().description,
-  //         //   likes: doc.data().likes,
-  //         //   lat: doc.data().lat,
-  //         //   long: doc.data().long
-  //         // }
-  //         let marker = {
-  //           latitude: doc.data().lat,
-  //           longitude: doc.data().long,
-  //           title: doc.data().title,
-  //           subtitle: doc.data().description,
-  //           storyId: doc.id,
-  //           color: 'green'
-  //         }
-  //         setMarkers([...markers, marker])
-  //         // stories.push(newStory)
-  //       })
-  //       // setStories(stories)
-  //     })
-  //     .catch((error: any) => {
-  //       console.log('Error getting documents: ', error)
-  //     })
-  // }
 
   useFocusEffect(
     useCallback(() => {

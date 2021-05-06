@@ -1,8 +1,9 @@
 import React from 'react'
 
 import { ActivityIndicator, View } from 'react-native'
-import { color } from 'react-native-reanimated'
+
 import { app } from '../styles/app'
+import { color } from '../styles/colors'
 
 const Loader = () => (
   <View style={app.activityIndicator}>
