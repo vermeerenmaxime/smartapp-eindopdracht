@@ -1,15 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import { createStackNavigator } from '@react-navigation/stack'
+import React, { useState } from 'react'
 
 import {
   Text,
   View,
   TouchableOpacity,
-  ScrollView,
   Alert,
-  Button,
   TextInput,
-  ActivityIndicator,
   KeyboardAvoidingView
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -18,63 +14,56 @@ import { header } from '../../styles/components/header'
 import AppButton from '../../components/appButton'
 
 import { firebase, firestore } from '../../database/firebase'
-import { color } from '../../styles/colors'
 import { setUserData } from '../../database/databaseContext'
+import Loader from '../../components/loader'
 
 const Register = ({ navigation }: any) => {
   const [username, setUsername] = useState('Maxime')
   const [email, setEmail] = useState('maxime6128@gmail.com')
-  const [password, setPassword] = useState('E')
+  const [password, setPassword] = useState('EEEEEEE')
 
   const [loading, setLoading] = useState(false)
 
   const registerUser = () => {
-    if (email === '' && password === '') {
+    if (username === '' || email === '' || password === '') {
       Alert.alert('Enter details to signup!')
     } else {
       setLoading(true)
       firebase
         .auth()
         .createUserWithEmailAndPassword(email, password)
-        .then((res: any) => {
+        .then(async (res: any) => {
           res.user.updateProfile({
             displayName: username
           })
 
-          firestore
+          await firestore
             .collection('user')
-            .doc(res.user.userId)
+            .doc(res.user.uid)
             .set({
               uid: res.user.uid,
-              displayName: res.user.displayName,
+              displayName: username,
               email: res.user.email,
               photoURL: res.user.photoURL
             })
+          setUserData(res.user)
 
-          console.log('User registered successfully!')
-          setLoading(false)
+          console.log('-- User successfully created! ', res.user.displayName)
+
           setUsername('')
           setPassword('')
           setEmail('')
 
-          setUserData(res.user)
-
-          navigation.navigate('TabNavigation', {
-            email: 'test'
-          })
+          navigation.navigate('TabNavigation', {})
         })
         .catch((error: any) => {
           alert(error)
-          setLoading(false)
         })
+      setLoading(false)
     }
   }
   if (loading) {
-    return (
-      <View style={app.activityIndicator}>
-        <ActivityIndicator size='large' color={color.gray} />
-      </View>
-    )
+    return <Loader />
   } else {
     return (
       <SafeAreaView style={[app.container, app.containerWelcome]}>

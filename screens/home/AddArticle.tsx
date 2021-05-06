@@ -10,7 +10,6 @@ import {
   TextInput,
   Image,
   KeyboardAvoidingView,
-
   Platform,
   ActivityIndicator
 } from 'react-native'
@@ -31,7 +30,6 @@ import SubTitle from '../../components/subTitle'
 import ArticleImage from '../../components/articleImage'
 import SwitchHeader from '../../components/switchHeader'
 import AppButton from '../../components/appButton'
-
 
 import ArticleModel from '../../models/Article'
 import {
@@ -166,16 +164,19 @@ const AddArticle = ({ route, navigation }: any) => {
     const storageRef = firebase.storage().ref('images/' + imageName)
     const task = storageRef.put(blob)
 
-    task.on('state_changed', (taskSnapshot: { bytesTransferred: number; totalBytes: number }) => {
-      console.log(
-        `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`
-      )
+    task.on(
+      'state_changed',
+      (taskSnapshot: { bytesTransferred: number; totalBytes: number }) => {
+        console.log(
+          `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`
+        )
 
-      setTransferred(
-        Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
-          100
-      )
-    })
+        setTransferred(
+          Math.round(taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) *
+            100
+        )
+      }
+    )
     try {
       await task
 
@@ -194,7 +195,7 @@ const AddArticle = ({ route, navigation }: any) => {
     console.log('woop')
 
     console.log(articleData)
-    if (articleData?.title && articleData?.note) {
+    if (articleData?.title && articleData?.note && articleData?.storyId) {
       console.log('ArticleData:', articleData)
       console.log('ArticleImages:', articleImages)
       let articleImagesUrl: string[] = []

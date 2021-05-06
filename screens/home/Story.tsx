@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { createStackNavigator } from '@react-navigation/stack'
 
 import {
   ImageBackground,
@@ -7,14 +6,12 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  Alert,
   Image,
   TextInput,
   ActivityIndicator,
   Switch,
   RefreshControl
 } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import SubTitle from '../../components/subTitle'
 
 import { LinearGradient } from 'expo-linear-gradient'
@@ -25,14 +22,11 @@ import { story } from '../../styles/components/story'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import {
   faHeart,
-  faLocationArrow,
-  faMapMarked,
   faMapMarkedAlt,
   faPencilAlt,
   faTrashAlt
 } from '@fortawesome/free-solid-svg-icons'
 import { firebase, firestore } from '../../database/firebase'
-import { useFocusEffect } from '@react-navigation/native'
 
 import StoryModel from '../../models/Story'
 import ArticleModel from '../../models/Article'
@@ -41,12 +35,10 @@ import UserModel from '../../models/User'
 import AppButton from '../../components/appButton'
 import { Overlay } from 'react-native-elements'
 
-import { getStories, userData } from '../../database/databaseContext'
+import { userData } from '../../database/databaseContext'
 import { color } from '../../styles/colors'
 
-const wait = (timeout: number) => {
-  return new Promise(resolve => setTimeout(resolve, timeout))
-}
+import { wait } from '../../utils/wait'
 
 const Story = ({ route, navigation, user }: any) => {
   const storyId = route.params.storyId
@@ -132,19 +124,17 @@ const Story = ({ route, navigation, user }: any) => {
     await authorRef
       .doc(storyData?.author)
       .get()
-      .then(
-        (doc: any) => {
-          let author: UserModel = {
-            uid: doc.id,
-            displayName: doc.data()?.displayName,
-            email: doc.data()?.email,
-            photoURL: doc.data()?.photoURL
-          }
-          setStoryAuthor(author)
-          // let author: any = doc.data()
-          // return author;
+      .then((doc: any) => {
+        let author: UserModel = {
+          uid: doc.id,
+          displayName: doc.data()?.displayName,
+          email: doc.data()?.email,
+          photoURL: doc.data()?.photoURL
         }
-      )
+        setStoryAuthor(author)
+        // let author: any = doc.data()
+        // return author;
+      })
       .catch((error: any) => {
         console.log('Error getting documents: ', error)
       })
@@ -232,12 +222,6 @@ const Story = ({ route, navigation, user }: any) => {
     if (storyPrivate) setStoryPrivate(false)
     else setStoryPrivate(true)
     updateStory(!storyPrivate)
-    // console.log('2', storyPrivate)
-
-    // setStoryData((oldStory: StoryModel) => {
-    //   oldStory.private = storyPrivate
-    //   return { ...oldStory }
-    // })
   }
 
   const Published = () => {
@@ -380,14 +364,19 @@ const Story = ({ route, navigation, user }: any) => {
                   alignItems: 'center',
                   marginTop: 8
                 }}
-                onPress={() =>
-                  navigation.navigate('MapOverview', {
+                onPress={() => {
+                  let region = {
                     region: {
                       latitude: storyData?.lat,
-                      longitude: storyData?.long
+                      longitude: storyData?.long,
+                      latitudeDelta: 0.05,
+                      longitudeDelta: 0.03
                     }
+                  }
+                  navigation.navigate('MapOverview', {
+                    region
                   })
-                }
+                }}
               >
                 <View
                   style={{

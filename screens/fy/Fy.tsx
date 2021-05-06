@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import {
   Text,
   View,
   ScrollView,
   ImageBackground,
-  TouchableOpacity
+  TouchableOpacity,
+  RefreshControl
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -17,22 +18,13 @@ import StoryModel from '../../models/Story'
 import { userData } from '../../database/databaseContext'
 import Header from '../../components/header'
 import { color } from '../../styles/colors'
+import SubTitle from '../../components/subTitle'
+
+import { wait } from '../../utils/wait'
 
 const Fy = ({ route, navigation }: any) => {
   const [loading, setLoading] = useState(true)
   const [stories, setStories] = useState<StoryModel[] | undefined>()
-
-  const [storyData, setStoryData] = useState<StoryModel>({
-    id: '',
-    author: '',
-    description: '',
-    image: '',
-    likes: 0,
-    private: true,
-    title: ''
-  })
-
-  const getRandomStory = async (storyId: string) => {}
 
   const storiesRef = firestore.collection('story')
   const getStories = async () => {
@@ -66,6 +58,14 @@ const Fy = ({ route, navigation }: any) => {
     return stories
   }
 
+  const [refreshing, setRefreshing] = useState(false)
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true)
+    wait(2000).then(() => setRefreshing(false))
+    getStories()
+  }, [])
+
   useEffect(() => {
     getStories()
     setLoading(false)
@@ -76,12 +76,18 @@ const Fy = ({ route, navigation }: any) => {
   } else {
     return (
       <SafeAreaView>
-        <ScrollView style={[app.container, { height: '100%' }]}>
+        <ScrollView
+          style={[app.container, { height: '100%' }]}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           <Header
             title='For You'
             props={route.params}
             navigation={navigation}
           />
+          <SubTitle title='Latest trips on the platform' />
 
           {stories?.length ? (
             stories.map(story => {
@@ -92,13 +98,13 @@ const Fy = ({ route, navigation }: any) => {
                   }
                   key={story.id}
                   style={{
-                    marginTop: 24,
+                    marginBottom: 24,
                     backgroundColor: color.light,
                     // height: '100%',
                     borderRadius: 12,
                     overflow: 'hidden',
 
-                    shadowColor: "black",
+                    shadowColor: 'black',
                     shadowOpacity: 0.1,
                     shadowRadius: 25
                   }}

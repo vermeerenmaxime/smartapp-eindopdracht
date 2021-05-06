@@ -1,50 +1,21 @@
-import { useFocusEffect } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-  ActivityIndicator,
-  RefreshControl
-} from 'react-native'
+import { Text, SafeAreaView, ScrollView, RefreshControl } from 'react-native'
 
-import AppButton from '../../components/appButton'
 import Header from '../../components/header'
 import Loader from '../../components/loader'
 import StoryBig from '../../components/storyBig'
 import SubTitle from '../../components/subTitle'
-import {
-  userStories,
-  getStories,
-  userData
-} from '../../database/databaseContext'
-// https://www.npmjs.com/package/react-native-parallax-scroll-view
+import { userData } from '../../database/databaseContext'
+
 import { firebase, firestore } from '../../database/firebase'
 import StoryModel from '../../models/Story'
 
 import { app } from '../../styles/app'
-import { color } from '../../styles/colors'
-
-const wait = (timeout: number) => {
-  return new Promise(resolve => setTimeout(resolve, timeout))
-}
+import { wait } from '../../utils/wait'
 
 const Profile = ({ route, navigation }: any) => {
   const [loading, setLoading] = useState(true)
   const [stories, setStories] = useState<StoryModel[]>()
-  const signOut = () => {
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        alert('Succesfully logged out')
-        navigation.navigate('Login')
-      })
-      .catch((error: any) => alert(error))
-  }
 
   const [refreshing, setRefreshing] = useState(false)
 
@@ -84,7 +55,6 @@ const Profile = ({ route, navigation }: any) => {
   }
 
   useEffect(() => {
-    // getStories()
     getUserStories()
 
     setLoading(false)

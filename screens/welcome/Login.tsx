@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Alert,
   TextInput,
-  ActivityIndicator,
   KeyboardAvoidingView
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -18,7 +17,6 @@ import { header } from '../../styles/components/header'
 
 import { firebase } from '../../database/firebase'
 import { setUserData } from '../../database/databaseContext'
-import { color } from '../../styles/colors'
 import Loader from '../../components/loader'
 
 const Login = ({ navigation }: any) => {
@@ -27,17 +25,17 @@ const Login = ({ navigation }: any) => {
 
   const [loading, setLoading] = useState(false)
 
-  const userLogin = () => {
-    if (email === '' && password === '') {
+  const userLogin = async () => {
+    if (email === '' || password === '') {
       Alert.alert('Enter details to signin!')
     } else {
       setLoading(true)
-      firebase
+      await firebase
         .auth()
         .signInWithEmailAndPassword(email, password)
         .then((res: any) => {
           console.log('-- User successfully logged in : ', res.user.displayName)
-          setLoading(false)
+
           setEmail('')
           setPassword('')
 
@@ -47,8 +45,8 @@ const Login = ({ navigation }: any) => {
         })
         .catch((error: any) => {
           alert(error)
-          setLoading(false)
         })
+      setLoading(false)
     }
   }
   if (loading) {

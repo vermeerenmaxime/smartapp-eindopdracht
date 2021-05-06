@@ -1,14 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { createStackNavigator } from '@react-navigation/stack'
 
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  RefreshControl
-} from 'react-native'
+import { Text, View, ScrollView, RefreshControl } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import Header from '../../components/header'
@@ -16,13 +8,10 @@ import SubTitle from '../../components/subTitle'
 
 import { app } from '../../styles/app'
 import StorySmall from '../../components/storySmall'
-import { userData } from '../../database/databaseContext'
 import StoryModel from '../../models/Story'
 import { firestore } from '../../database/firebase'
 
-const wait = (timeout: number) => {
-  return new Promise(resolve => setTimeout(resolve, timeout))
-}
+import { wait } from '../../utils/wait'
 
 const Overview = ({ route, navigation }: any) => {
   const [stories, setStories] = useState<StoryModel[]>()

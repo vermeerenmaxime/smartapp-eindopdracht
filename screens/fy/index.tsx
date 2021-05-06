@@ -11,7 +11,7 @@ const Stack = createStackNavigator()
 const Add = ({ route, navigation }: any) => {
   return (
     // headerMode="none"
-    <Stack.Navigator headerMode='none' initialRouteName='AddStory'>
+    <Stack.Navigator headerMode='none' initialRouteName='Fy'>
       <Stack.Screen
         name='Fy'
         component={Fy}

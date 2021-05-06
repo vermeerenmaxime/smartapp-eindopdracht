@@ -8,7 +8,7 @@ export const header = StyleSheet.create({
     alignItems: 'center'
   },
   title: {
-    fontSize: 64,
+    fontSize: 48,
     fontFamily: 'RobotoBold',
     fontWeight: 'bold'
   },
