@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { ImageBackground, Text, TouchableOpacity } from 'react-native'
-import { app } from '../styles/app'
+
 import { color } from '../styles/colors'
 import { story } from '../styles/components/story'
 
